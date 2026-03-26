@@ -59,12 +59,4 @@ public class User {
     public void setStatus(boolean status) {
         this.status = status;
     }
-
-    public void input(Scanner sc){
-        setUsername(InputMethod.getString(sc,"Nhập tên tài khoản : "));
-        setPassword(InputMethod.getString(sc,"Nhập mật khẩu : "));
-        setStatus(true);
-        setRole(UserRoleEnum.customer);
-    }
-
 }

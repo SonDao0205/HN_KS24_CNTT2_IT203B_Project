@@ -22,6 +22,29 @@ public class UserDao {
         return instance;
     }
 
+    public User findById(int id) {
+        String sql = "select * from user where id=?";
+        try (
+                Connection conn = DatabaseConnection.openConnection();
+                PreparedStatement ps = conn.prepareStatement(sql);
+        ) {
+            ps.setInt(1,id);
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                return new User(
+                        rs.getInt("id"),
+                        rs.getString("username"),
+                        rs.getString("password"),
+                        UserRoleEnum.valueOf(rs.getString("role"))
+                );
+            }
+
+        } catch (Exception e) {
+            throw new RuntimeException(e.getMessage());
+        }
+        return null;
+    }
+
     public User findByUsername(String username) {
         String sql = "SELECT * FROM Users WHERE username = ?";
         try (
@@ -39,7 +62,7 @@ public class UserDao {
                 );
             }
         } catch (Exception e) {
-            throw new RuntimeException("Lỗi đăng nhập!");
+            throw new RuntimeException(e.getMessage());
         }
         return null;
     }
@@ -58,13 +81,14 @@ public class UserDao {
             throw new RuntimeException("Tên tài khoản đã tồn tại");
         }
 
-        String sql = "INSERT INTO Users (username, password) VALUES (?, ?)";
+        String sql = "INSERT INTO Users (username, password,role) VALUES (?, ?,?)";
         try (
                 Connection conn = DatabaseConnection.openConnection();
                 PreparedStatement pstmt = conn.prepareStatement(sql);
         ) {
             pstmt.setString(1, username);
             pstmt.setString(2, BCrypt.hashpw(password, BCrypt.gensalt()));
+            pstmt.setString(3, UserRoleEnum.customer.name());
             return pstmt.executeUpdate() > 0;
         } catch (Exception e) {
             throw new RuntimeException("Lỗi đăng ký!");
