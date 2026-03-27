@@ -8,7 +8,7 @@ public class InputMethod {
             System.out.print(label);
             String input = sc.nextLine().trim();
             if(input.isEmpty()){
-                System.out.println(Constant.InputErrorMsg);
+                System.out.println(Constant.INPUT_ERR_MGS);
             }else{
                 return input;
             }
@@ -21,11 +21,11 @@ public class InputMethod {
                 System.out.print(label);
                 int input = Integer.parseInt(sc.nextLine().trim());
                 if(input < 0){
-                    System.out.println(Constant.InputErrorMsg);
+                    System.out.println(Constant.INPUT_ERR_MGS);
                 }
                 return input;
             }catch(NumberFormatException e){
-                System.out.println(Constant.InputErrorMsg);
+                System.out.println(Constant.INPUT_ERR_MGS);
             }
         }
     }
@@ -36,11 +36,11 @@ public class InputMethod {
                 System.out.print(label);
                 double input = Double.parseDouble(sc.nextLine().trim());
                 if(input < 0){
-                    System.out.println(Constant.InputErrorMsg);
+                    System.out.println(Constant.INPUT_ERR_MGS);
                 }
                 return input;
             }catch(NumberFormatException e){
-                System.out.println(Constant.InputErrorMsg);
+                System.out.println(Constant.INPUT_ERR_MGS);
             }
         }
     }

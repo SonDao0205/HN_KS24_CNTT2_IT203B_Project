@@ -5,18 +5,17 @@ import com.restaurant.java.utils.UserSession;
 
 import java.util.Scanner;
 
-public class CustomerMenu {
+public class ManagerMenu {
     public static void printMenu(Scanner sc){
         int choice;
         do {
             System.out.println("""
                     +---------------------------------------+
-                    |           Customer Ordering           |
+                    |          Restaurant Management        |
                     +---------------------------------------+
-                    | 1. Xem menu                           |
-                    | 2. Chọn bàn trống                     |
-                    | 3. Xem danh sách order                |
-                    | 4. Huỷ món                            |
+                    | 1. Quản lý menu                       |
+                    | 2. Quản lý bàn ăn                     |
+                    | 3. Quản lý người dùng                 |
                     | 0. Thoát                              |
                     +---------------------------------------+""");
             choice = InputMethod.getInt(sc,"Lựa chọn của bạn : ");

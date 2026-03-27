@@ -15,10 +15,14 @@ public class DatabaseConnection {
             Class.forName(DRIVER);
             return DriverManager.getConnection(URL,USERNAME,PASSWORD);
         } catch (ClassNotFoundException e) {
-            System.err.println("Lỗi : Chưa cài đặt class!");
+            System.out.println("Lỗi : Chưa cài đặt class!");
         } catch (SQLException e) {
-            System.err.println("Lỗi SQL kết nối thất bại!");
+            System.out.println("Lỗi SQL kết nối thất bại!");
         }
         return null;
+    }
+
+    static void main(String[] args) {
+        Connection con = openConnection();
     }
 }

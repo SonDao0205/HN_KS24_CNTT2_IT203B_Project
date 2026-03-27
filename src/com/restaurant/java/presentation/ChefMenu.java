@@ -5,21 +5,19 @@ import com.restaurant.java.utils.UserSession;
 
 import java.util.Scanner;
 
-public class CustomerMenu {
-    public static void printMenu(Scanner sc){
+public class ChefMenu {
+    public static void printMenu(Scanner sc) {
         int choice;
         do {
             System.out.println("""
                     +---------------------------------------+
-                    |           Customer Ordering           |
+                    |              Chef Menu                |
                     +---------------------------------------+
-                    | 1. Xem menu                           |
-                    | 2. Chọn bàn trống                     |
-                    | 3. Xem danh sách order                |
-                    | 4. Huỷ món                            |
+                    | 1. Xem danh sách các món đang chờ     |
+                    | 2. Cập nhật trạng thái món ăn         |
                     | 0. Thoát                              |
                     +---------------------------------------+""");
-            choice = InputMethod.getInt(sc,"Lựa chọn của bạn : ");
+            choice = InputMethod.getInt(sc, "Lựa chọn của bạn : ");
             switch (choice) {
                 case 0:
                     System.out.println("Bạn có chắc chắn muốn đăng xuất : ");
@@ -27,14 +25,15 @@ public class CustomerMenu {
                     System.out.println("2. Huỷ");
                     int subChoice = InputMethod.getInt(sc, "Lựa chọn của bạn : ");
                     switch (subChoice) {
-                        case 1 -> UserSession.getInstance().logout();
-                        case 2 -> choice = -1;
+                        case 1:
+                            UserSession.getInstance().logout();
+                            return;
                     }
                     break;
                 default:
                     System.out.println("Lựa chọn không phù hợp!");
                     break;
             }
-        }while(choice != 0);
+        } while (choice != 0);
     }
 }
