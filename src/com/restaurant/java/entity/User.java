@@ -16,12 +16,12 @@ public class User {
     public User() {
     }
 
-    public User(int id, String username, String password, UserRoleEnum role) {
+    public User(int id, String username, String password, UserRoleEnum role, boolean status) {
         this.id = id;
         this.username = username;
         this.password = password;
         this.role = role;
-        this.status = true;
+        this.status = status;
     }
 
     public int getId() {

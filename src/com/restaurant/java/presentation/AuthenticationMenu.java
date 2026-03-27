@@ -2,6 +2,7 @@ package com.restaurant.java.presentation;
 
 import com.restaurant.java.entity.User;
 import com.restaurant.java.entity.enums.UserRoleEnum;
+import com.restaurant.java.exception.AccountLockException;
 import com.restaurant.java.service.IUserServiceImpl;
 import com.restaurant.java.utils.InputMethod;
 
@@ -24,9 +25,9 @@ public class AuthenticationMenu {
                         System.out.println("Đăng nhập thành công!");
                         switch (userRole) {
                             // phân quyền
-                            case UserRoleEnum.chef -> System.out.println("Chef");
-                            case UserRoleEnum.manager ->  System.out.println("Manager");
-                            case UserRoleEnum.customer ->   System.out.println("Customer");
+                            case UserRoleEnum.chef -> ChefMenu.printMenu(sc);
+                            case UserRoleEnum.manager ->  ManagerMenu.printMenu(sc);
+                            case UserRoleEnum.customer ->   CustomerMenu.printMenu(sc);
                         }
                     }else{
                         System.out.println("Đăng nhập thất bại!");
@@ -68,7 +69,11 @@ public class AuthenticationMenu {
     }
 
     public static UserRoleEnum handleLogin(String username, String password, IUserServiceImpl userService) {
-        return userService.login(username, password).getRole();
+        try{
+            return userService.login(username, password).getRole();
+        }catch(Exception e){
+            return null;
+        }
     }
 
     public static boolean handleRegister(String username, String password, IUserServiceImpl userService) {
