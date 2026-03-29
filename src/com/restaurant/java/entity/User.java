@@ -24,6 +24,19 @@ public class User {
         this.status = status;
     }
 
+    public User(String username, String password, UserRoleEnum role) {
+        this.username = username;
+        this.password = password;
+        this.role = role;
+    }
+
+    public User(int id, String username, UserRoleEnum role, boolean status) {
+        this.username = username;
+        this.role = role;
+        this.status = status;
+        this.id = id;
+    }
+
     public int getId() {
         return id;
     }

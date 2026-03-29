@@ -15,6 +15,11 @@ public class Categories {
         this.status = status;
     }
 
+    public Categories(String name) {
+        this.name = name;
+        this.status = true;
+    }
+
     public Categories() {
         this.status = true;
     }

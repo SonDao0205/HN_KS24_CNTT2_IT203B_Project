@@ -20,6 +20,11 @@ public class Menu_Item {
         this.status = status;
     }
 
+    public Menu_Item(String name, double price) {
+        this.name = name;
+        this.price = price;
+    }
+
     public Menu_Item() {
         this.status = true;
     }

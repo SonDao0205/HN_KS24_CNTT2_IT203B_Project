@@ -9,7 +9,7 @@ import com.restaurant.java.utils.InputMethod;
 import java.util.Scanner;
 
 public class AuthenticationMenu {
-    public static void printLoginMenu(Scanner sc, IUserServiceImpl userService) {
+    public static void printLoginMenu(Scanner sc) {
         int choice;
         System.out.println("---------------Login----------------");
         String username = InputMethod.getString(sc,"Tên đăng nhập : ");
@@ -20,7 +20,7 @@ public class AuthenticationMenu {
             choice = InputMethod.getInt(sc,"Lựa chọn của bạn : ");
             switch (choice) {
                 case 1:
-                    UserRoleEnum userRole = handleLogin(username,password,userService);
+                    UserRoleEnum userRole = handleLogin(username,password,IUserServiceImpl.getInstance());
                     if(userRole != null){
                         System.out.println("Đăng nhập thành công!");
                         switch (userRole) {
@@ -42,7 +42,7 @@ public class AuthenticationMenu {
         }while(choice != 0);
     }
 
-    public static void printRegisterMenu(Scanner sc, IUserServiceImpl userService) {
+    public static void printRegisterMenu(Scanner sc) {
         int choice;
         System.out.println("---------------Register----------------");
         String username = InputMethod.getString(sc,"Tên đăng nhập : ");
@@ -53,7 +53,7 @@ public class AuthenticationMenu {
             choice = InputMethod.getInt(sc,"Lựa chọn của bạn : ");
             switch (choice) {
                 case 1:
-                        if(handleRegister(username,password,userService)){
+                        if(handleRegister(username,password,IUserServiceImpl.getInstance())){
                             System.out.println("Đăng ký thành công!");
                         }else{
                             System.out.println("Đăng ký thất bại!");

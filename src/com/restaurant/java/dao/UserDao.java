@@ -10,6 +10,8 @@ import org.mindrot.jbcrypt.BCrypt;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.util.ArrayList;
+import java.util.List;
 
 public class UserDao {
     private static UserDao instance;
@@ -30,7 +32,7 @@ public class UserDao {
                 Connection conn = DatabaseConnection.openConnection();
                 PreparedStatement ps = conn.prepareStatement(sql);
         ) {
-            ps.setInt(1,id);
+            ps.setInt(1, id);
             ResultSet rs = ps.executeQuery();
             if (rs.next()) {
                 return new User(
@@ -40,12 +42,12 @@ public class UserDao {
                         UserRoleEnum.valueOf(rs.getString("role")),
                         rs.getBoolean("status")
                 );
+            } else {
+                return null;
             }
-
         } catch (Exception e) {
             throw new RuntimeException(e.getMessage());
         }
-        return null;
     }
 
     public User findByUsername(String username) {
@@ -64,21 +66,22 @@ public class UserDao {
                         UserRoleEnum.valueOf(rs.getString("role")),
                         rs.getBoolean("status")
                 );
+            } else {
+                return null;
             }
         } catch (Exception e) {
             throw new RuntimeException(e.getMessage());
         }
-        return null;
     }
 
     public User login(String username, String password) throws Exception {
         User user = findByUsername(username);
 
-        if(user == null){
+        if (user == null) {
             throw new Exception("Tên tài khoản hoặc mật khẩu không chính xác!");
         }
 
-        if(!user.isStatus()){
+        if (!user.isStatus()) {
             throw new AccountLockException("Tài khoản đã bị khoá!");
         }
 
@@ -104,6 +107,75 @@ public class UserDao {
             return pstmt.executeUpdate() > 0;
         } catch (Exception e) {
             throw new RuntimeException("Lỗi đăng ký!");
+        }
+    }
+
+    public boolean insert(User user) {
+        String sql = "INSERT INTO Users (username, password, role) VALUES (?, ?, ?)";
+        try (
+                Connection conn = DatabaseConnection.openConnection();
+                PreparedStatement pstmt = conn.prepareStatement(sql);
+        ) {
+            pstmt.setString(1, user.getUsername());
+            pstmt.setString(2, PasswordHased.hashPassword(user.getPassword()));
+            pstmt.setString(3, user.getRole().name());
+            return pstmt.executeUpdate() > 0;
+        } catch (Exception e) {
+            System.out.println("Lỗi khi thêm tài khoản");
+            return false;
+        }
+    }
+
+    public boolean update(User user) {
+        String sql = "UPDATE Users SET username = ? , role = ? WHERE id = ?";
+        try (
+                Connection conn = DatabaseConnection.openConnection();
+                PreparedStatement pstmt = conn.prepareStatement(sql);
+        ) {
+            pstmt.setString(1, user.getUsername());
+            pstmt.setString(2, user.getRole().name());
+            pstmt.setInt(3, user.getId());
+            return pstmt.executeUpdate() > 0;
+        } catch (Exception e) {
+            System.out.println("Lỗi khi thêm tài khoản");
+            return false;
+        }
+    }
+
+    public boolean delete(int id) {
+        String sql = "UPDATE Users SET status = 0 WHERE id = ?";
+        try (
+                Connection conn = DatabaseConnection.openConnection();
+                PreparedStatement pstmt = conn.prepareStatement(sql);
+        ) {
+            pstmt.setInt(1, id);
+            return pstmt.executeUpdate() > 0;
+        } catch (Exception e) {
+            System.out.println("Lỗi khi thêm tài khoản");
+            return false;
+        }
+    }
+
+    public List<User> getList() {
+        String sql = "SELECT * FROM Users";
+        try (
+                Connection conn = DatabaseConnection.openConnection();
+                PreparedStatement pstmt = conn.prepareStatement(sql);
+        ) {
+            ResultSet rs = pstmt.executeQuery();
+            List<User> users = new ArrayList<>();
+            while (rs.next()) {
+                users.add(new User(
+                        rs.getInt("id"),
+                        rs.getString("username"),
+                        UserRoleEnum.valueOf(rs.getString("role")),
+                        rs.getBoolean("status")
+                ));
+            }
+            return users;
+        } catch (Exception e) {
+            System.out.println("Lỗi lấy danh sách tài khoản!");
+            return null;
         }
     }
 }

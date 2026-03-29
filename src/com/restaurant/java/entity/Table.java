@@ -18,6 +18,11 @@ public class Table {
         this.status = status;
     }
 
+    public Table(String number, int capacity) {
+        this.number = number;
+        this.capacity = capacity;
+    }
+
     public Table() {
         this.status = TableEnum.available;
     }

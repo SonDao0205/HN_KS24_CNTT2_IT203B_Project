@@ -14,12 +14,25 @@ public class ManagerMenu {
                     |          Restaurant Management        |
                     +---------------------------------------+
                     | 1. Quản lý menu                       |
-                    | 2. Quản lý bàn ăn                     |
-                    | 3. Quản lý người dùng                 |
+                    | 2. Quản lý danh mục                   |
+                    | 3. Quản lý bàn ăn                     |
+                    | 4. Quản lý người dùng                 |
                     | 0. Thoát                              |
                     +---------------------------------------+""");
             choice = InputMethod.getInt(sc,"Lựa chọn của bạn : ");
             switch (choice) {
+                case 1:
+                    MenuManagement.printMenu(sc);
+                    break;
+                case 2:
+                    CategoriesManagement.printMenu(sc);
+                    break;
+                case 3:
+                    TableManagement.printMenu(sc);
+                    break;
+                case 4:
+                    UserManagement.printMenu(sc);
+                    break;
                 case 0:
                     System.out.println("Bạn có chắc chắn muốn đăng xuất : ");
                     System.out.println("1. Xác nhận");
