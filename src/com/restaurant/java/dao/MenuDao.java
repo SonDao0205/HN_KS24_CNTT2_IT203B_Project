@@ -79,7 +79,7 @@ public class MenuDao {
                 SELECT m.id, m.name, m.price, m.status, c.id as categories_id, c.name as categories_name, c.status as categories_status
                 FROM Project.Menu_Items m
                 JOIN Categories c ON m.categories_id = c.id
-                WHERE m.id = ?;
+                WHERE m.id = ? AND m.status = 1 AND c.status = 1;
                 """;
 
         try (

@@ -4,6 +4,7 @@ import com.restaurant.java.entity.User;
 import com.restaurant.java.entity.enums.UserRoleEnum;
 import com.restaurant.java.exception.AccountLockException;
 import com.restaurant.java.service.IUserServiceImpl;
+import com.restaurant.java.utils.Constant;
 import com.restaurant.java.utils.InputMethod;
 
 import java.util.Scanner;
@@ -22,7 +23,7 @@ public class AuthenticationMenu {
                 case 1:
                     UserRoleEnum userRole = handleLogin(username,password,IUserServiceImpl.getInstance());
                     if(userRole != null){
-                        System.out.println("Đăng nhập thành công!");
+                        System.out.println(Constant.GREEN_CODE + "Đăng nhập thành công!" + Constant.RESET_CODE);
                         switch (userRole) {
                             // phân quyền
                             case UserRoleEnum.chef -> ChefMenu.printMenu(sc);
@@ -30,13 +31,13 @@ public class AuthenticationMenu {
                             case UserRoleEnum.customer ->   CustomerMenu.printMenu(sc);
                         }
                     }else{
-                        System.out.println("Đăng nhập thất bại!");
+                        System.out.println(Constant.RED_CODE + "Đăng nhập thất bại!" + Constant.RESET_CODE);
                     }
                     return;
                 case 0:
                     break;
                 default:
-                    System.out.println("Lựa chọn không phù hợp!");
+                    System.out.println(Constant.INVALID_CHOICE);
                     break;
             }
         }while(choice != 0);
@@ -54,15 +55,15 @@ public class AuthenticationMenu {
             switch (choice) {
                 case 1:
                         if(handleRegister(username,password,IUserServiceImpl.getInstance())){
-                            System.out.println("Đăng ký thành công!");
+                            System.out.println(Constant.GREEN_CODE + "Đăng ký thành công!" + Constant.RESET_CODE);
                         }else{
-                            System.out.println("Đăng ký thất bại!");
+                            System.out.println(Constant.RED_CODE + "Đăng ký thất bại!" + Constant.RESET_CODE);
                         }
                     return;
                 case 0:
                     break;
                 default:
-                    System.out.println("Lựa chọn không phù hợp!");
+                    System.out.println(Constant.INVALID_CHOICE);
                     break;
             }
         }while(choice != 0);

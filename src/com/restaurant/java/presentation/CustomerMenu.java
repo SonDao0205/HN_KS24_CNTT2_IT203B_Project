@@ -8,6 +8,7 @@ import com.restaurant.java.service.IMenuServiceImpl;
 import com.restaurant.java.service.IOrderService;
 import com.restaurant.java.service.IOrderServiceImpl;
 import com.restaurant.java.service.ITableServiceImpl;
+import com.restaurant.java.utils.Constant;
 import com.restaurant.java.utils.InputMethod;
 import com.restaurant.java.utils.UserSession;
 
@@ -59,7 +60,7 @@ public class CustomerMenu {
                     }
                     break;
                 default:
-                    System.out.println("Lựa chọn không phù hợp!");
+                    System.out.println(Constant.INVALID_CHOICE);
                     break;
             }
         } while (choice != 0);
@@ -72,20 +73,22 @@ public class CustomerMenu {
             return;
         }
         System.out.println("Danh sách thực đơn : ");
+        Menu_Item.tableHeader();
         for (Menu_Item menuItem : menuList) {
-            System.out.printf("| Id : %d | Name : %s | Price : %.2f |\n", menuItem.getId(), menuItem.getName(), menuItem.getPrice());
+            menuItem.displayDataCustomer();
+            System.out.println("+-------------------------------------------------------------------------+");
         }
     }
 
     public static void pickTable(Scanner sc) {
         List<Table> tableList = ITableServiceImpl.getInstance().getTableAvailable();
         if (tableList == null || tableList.isEmpty()) {
-            System.out.println("Danh sách bàn trống rỗng!");
             return;
         }
 
+        Table.tableHeader();
         for (Table table : tableList) {
-            System.out.printf("|Id : %d |Number : %s | Capacity : %d |\n", table.getId(), table.getNumber(), table.getCapacity());
+            table.displayTableCustomer();
         }
 
         int choice;
@@ -98,8 +101,15 @@ public class CustomerMenu {
                 case 1:
                     int table_id;
                     while (true) {
+                        boolean flag = false;
                         table_id = InputMethod.getInt(sc, "Nhập id của bàn muốn chọn : ");
-                        if (ITableServiceImpl.getInstance().getById(table_id) == null) {
+                        for (Table table : tableList) {
+                            if (table.getId() == table_id) {
+                                flag = true;
+                                break;
+                            }
+                        }
+                        if (!flag) {
                             System.out.println("Id bàn không phù hợp!");
                         } else {
                             break;
@@ -107,16 +117,16 @@ public class CustomerMenu {
                     }
                     if (ITableServiceImpl.getInstance().bookedTable(table_id)) {
                         if (IOrderServiceImpl.getInstance().createOrder(UserSession.getInstance().getCurrentUser().getId(), table_id)) {
-                            System.out.println("Đặt bàn thành công!");
+                            System.out.println(Constant.GREEN_CODE + "Đặt bàn thành công!" + Constant.RESET_CODE);
                         }
                     } else {
-                        System.out.println("Đặt bàn thất bại!");
+                        System.out.println(Constant.RED_CODE + "Đặt bàn thất bại!" + Constant.RESET_CODE);
                     }
                     return;
                 case 0:
                     return;
                 default:
-                    System.out.println("Lựa chọn không phù hợp!");
+                    System.out.println(Constant.INVALID_CHOICE);
                     break;
 
             }
@@ -130,7 +140,7 @@ public class CustomerMenu {
         int table_id = InputMethod.getInt(sc, "Nhập id của bàn muốn gọi món : ");
         Order pickOrder = IOrderServiceImpl.getInstance().getOrder(UserSession.getInstance().getCurrentUser().getId(), table_id);
         if (pickOrder == null) {
-            System.out.println("Id bàn không hợp lệ!");
+            System.out.println(Constant.INVALID_ID_FOUND);
             return;
         }
         int item_id;
@@ -145,19 +155,20 @@ public class CustomerMenu {
             if (item_id == 0) {
                 return;
             }
+
             Menu_Item item = IMenuServiceImpl.getInstance().getById(item_id);
             if (item == null) {
-                System.out.println("Id món không hợp lệ!");
+                System.out.println(Constant.INVALID_ID_FOUND);
             } else {
                 quantity = InputMethod.getInt(sc, "Nhập số lượng : ");
                 if (quantity <= 0) {
-                    System.out.println("Số lượng không hợp lệ!");
+                    System.out.println(Constant.VARIABLE_ERR_MGS);
                     return;
                 }
                 System.out.print("Ghi chú cho món : ");
                 note = sc.nextLine();
                 menuItems.add(item);
-                System.out.println("Thêm món vào giỏ hàng thành công!");
+                System.out.println(Constant.GREEN_CODE + "Thêm món vào giỏ hàng thành công!" + Constant.RESET_CODE);
                 System.out.println("Bạn có muốn tiếp tục đặt món : ");
                 System.out.println("1. Tiếp tục đặt món");
                 System.out.println("2. Huỷ các món đã đặt trong giỏ hàng");
@@ -171,13 +182,13 @@ public class CustomerMenu {
                         break;
                     case 3:
                         if (!handleCompleteOrder(menuItems, pickOrder, quantity, note)) {
-                            System.out.println("Thêm món thất bại!");
+                            System.out.println(Constant.RED_CODE + "Thêm món thất bại!" +  Constant.RESET_CODE);
                         } else {
-                            System.out.println("Thêm món thành công!");
+                            System.out.println(Constant.GREEN_CODE + "Thêm món thành công!" +  Constant.RESET_CODE);
                         }
                         return;
                     default:
-                        System.out.println("Lựa chọn không phù hợp!");
+                        System.out.println(Constant.INVALID_CHOICE);
                         break;
                 }
             }
@@ -191,8 +202,9 @@ public class CustomerMenu {
             return null;
         }
         System.out.println("Danh sách món trong giỏ hàng : ");
+        Menu_Item.tableHeader();
         for (Menu_Item menuItem : menuItems) {
-            System.out.printf("|Id : %d |Name : %s | Price : %.2f | Quantity : %d |\n", menuItem.getId(), menuItem.getName(), menuItem.getPrice(), quantity);
+            menuItem.displayDataCustomer();
         }
         int choice = 0;
         while (choice != 2) {
@@ -206,16 +218,16 @@ public class CustomerMenu {
                 switch (choice) {
                     case 1:
                         menuItems.removeIf(item -> item.getId() == item_id);
-                        System.out.println("Huỷ món khỏi giỏ hàng thành công!");
+                        System.out.println(Constant.GREEN_CODE + "Huỷ món khỏi giỏ hàng thành công!" +  Constant.RESET_CODE);
                         return menuItems;
                     case 2:
                         break;
                     default:
-                        System.out.println("Lựa chọn không phù hợp!");
+                        System.out.println(Constant.INVALID_CHOICE);
                         break;
                 }
             } else {
-                System.out.println("Id không hợp lệ!");
+                System.out.println(Constant.INVALID_ID_FOUND);
             }
         }
         return menuItems;
@@ -239,8 +251,9 @@ public class CustomerMenu {
             return false;
         }
         System.out.println("Thông tin các bàn hiện tại : ");
+        Table.tableHeader();
         for (Table table : tableList) {
-            System.out.printf("Id : %d | Number : %s | Capacity : %d |\n", table.getId(), table.getNumber(), table.getCapacity());
+            table.displayTableCustomer();
         }
         return true;
     }
@@ -252,7 +265,7 @@ public class CustomerMenu {
         int table_id = InputMethod.getInt(sc, "Nhập id của bàn muốn theo dõi : ");
         Order pickOrder = IOrderServiceImpl.getInstance().getOrder(UserSession.getInstance().getCurrentUser().getId(), table_id);
         if (pickOrder == null) {
-            System.out.println("Id bàn không hợp lệ!");
+            System.out.println(Constant.INVALID_ID_FOUND);
             return;
         }
         List<Order_Item> orderItemsList = IOrderServiceImpl.getInstance().getOrderItems(UserSession.getInstance().getCurrentUser().getId(), table_id, pickOrder);
@@ -261,14 +274,10 @@ public class CustomerMenu {
             return;
         }
         System.out.println("Danh sách các món đã gọi : ");
+        Order_Item.tableHeader();
         for (Order_Item orderItem : orderItemsList) {
-            System.out.printf("|Id : %d | Name : %s | Price : %.2f | Quantity : %d | Status : %s |\n",
-                    orderItem.getId(),
-                    orderItem.getMenu_item().getName(),
-                    orderItem.getUnit_price(),
-                    orderItem.getQuantity(),
-                    orderItem.getStatus()
-            );
+            orderItem.displayDataCustomer();
+            System.out.println("+--------------------------------------------------------------------------+");
         }
     }
 
@@ -283,19 +292,18 @@ public class CustomerMenu {
         switch (choice) {
             case 1:
                 if (IOrderServiceImpl.getInstance().cancelOrderItem(id)) {
-                    System.out.println("Huỷ món thành công!");
+                    System.out.println(Constant.GREEN_CODE +  "Huỷ món thành công!" + Constant.RESET_CODE);
                 } else {
-                    System.out.println("Huỷ món thất bại!");
+
+                    System.out.println(Constant.RED_CODE +  "Huỷ món thất bại!" + Constant.RESET_CODE);
                 }
                 return;
             case 2:
                 System.out.println("Đã huỷ thao tác!");
                 return;
             default:
-                System.out.println("Lựa chọn không hợp lệ!");
+                System.out.println(Constant.INVALID_CHOICE);
                 return;
         }
-
-
     }
 }

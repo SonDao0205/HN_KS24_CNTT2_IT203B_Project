@@ -5,6 +5,7 @@ import com.restaurant.java.entity.Menu_Item;
 import com.restaurant.java.service.ICategoriesService;
 import com.restaurant.java.service.ICategoriesServiceImpl;
 import com.restaurant.java.service.IMenuServiceImpl;
+import com.restaurant.java.utils.Constant;
 import com.restaurant.java.utils.InputMethod;
 
 import java.util.ArrayList;
@@ -30,9 +31,9 @@ public class MenuManagement {
             switch (choice) {
                 case 1:
                     if (insertMenu(sc)) {
-                        System.out.println("Thêm món thành công!");
+                        System.out.println(Constant.GREEN_CODE + "Thêm món thành công!" + Constant.RESET_CODE);
                     } else {
-                        System.out.println("Thêm món thất bại!");
+                        System.out.println(Constant.RED_CODE + "Thêm món thất bại!" + Constant.RESET_CODE);
                     }
                     break;
                 case 2:
@@ -40,9 +41,9 @@ public class MenuManagement {
                     break;
                 case 3:
                     if (deleteMenu(sc)) {
-                        System.out.println("Xoá món thành công!");
+                        System.out.println(Constant.GREEN_CODE + "Xoá món thành công!" + Constant.RESET_CODE);
                     } else {
-                        System.out.println("Xoá món thất bại!");
+                        System.out.println(Constant.RED_CODE + "Xoá món thất bại!" + Constant.RESET_CODE);
                     }
                     break;
                 case 4:
@@ -54,7 +55,7 @@ public class MenuManagement {
                 case 0:
                     break;
                 default:
-                    System.out.println("Lựa chọn không phù hợp!");
+                    System.out.println(Constant.INVALID_CHOICE);
                     break;
             }
         } while (choice != 0);
@@ -70,7 +71,7 @@ public class MenuManagement {
         while (true) {
             price = InputMethod.getDouble(sc, "Nhập giá : ");
             if (price <= 0) {
-                System.out.println("Giá tiền không hợp lệ!");
+                System.out.println(Constant.INPUT_ERR_MGS);
             } else {
                 break;
             }
@@ -99,16 +100,17 @@ public class MenuManagement {
     }
 
     public static void updateMenu(Scanner sc) {
-        int menu_id;
-        while (true) {
-            menu_id = InputMethod.getInt(sc, "Nhập id của món bạn muốn sửa : ");
-            if (menu_id <= 0) {
-                System.out.println("Dữ liệu không hợp lệ!");
-            } else {
-                break;
-            }
-        }
+        int menu_id = InputMethod.getInt(sc, "Nhập id của món bạn muốn sửa : ");
         Menu_Item findMenuItem = IMenuServiceImpl.getInstance().getById(menu_id);
+        if(findMenuItem == null) {
+            System.out.println(Constant.INVALID_ID_FOUND);
+            System.out.println(Constant.RED_CODE + "Cập nhật thất bại!" + Constant.RESET_CODE);
+            return;
+        }
+        System.out.println("Dữ liệu cũ : ");
+        Menu_Item.tableHeader();
+        findMenuItem.displayDataCustomer();
+        System.out.println("+-------------------------------------------------------------------------+");
         System.out.println("Chức năng bạn muốn sửa : ");
         int choice;
         do {
@@ -122,37 +124,38 @@ public class MenuManagement {
                 case 1:
                     String name = InputMethod.getString(sc, "Nhập tên mới : ");
                     findMenuItem.setName(name);
-                    System.out.println("Cập nhật thành công");
+                    System.out.println(Constant.GREEN_CODE + "Cập nhật thành công" + Constant.RESET_CODE);
                     break;
                 case 2:
                     double price;
                     while (true) {
                         price = InputMethod.getDouble(sc, "Nhập giá : ");
                         if (price <= 0) {
-                            System.out.println("Giá tiền không hợp lệ!");
+                            System.out.println(Constant.VARIABLE_ERR_MGS);
                         } else {
                             findMenuItem.setPrice(price);
-                            System.out.println("Cập nhật thành công");
+                            System.out.println(Constant.GREEN_CODE + "Cập nhật thành công" + Constant.RESET_CODE);
                             break;
                         }
                     }
                 case 3:
                     Categories categories = pickCategory(sc);
                     findMenuItem.setCategories(categories);
-                    System.out.println("Cập nhật thành công");
+                    System.out.println(Constant.GREEN_CODE + "Cập nhật thành công" + Constant.RESET_CODE);
                     break;
                 case 4:
                     if (IMenuServiceImpl.getInstance().update(findMenuItem)) {
-                        System.out.println("Cập nhật thông tin thành công!");
+                        System.out.println(Constant.GREEN_CODE + "Cập nhật thông tin thành công!" + Constant.RESET_CODE);
+
                     } else {
-                        System.out.println("Cập nhật thông tin thất bại!");
+                        System.out.println(Constant.RED_CODE + "Cập nhật thông tin thất bại!" + Constant.RESET_CODE);
                     }
                     return;
                 case 0:
                     System.out.println("Đã huỷ các thay đổi");
                     return;
                 default:
-                    System.out.println("Lựa chọn không phù hợp!");
+                    System.out.println(Constant.INVALID_CHOICE);
                     break;
             }
         } while (true);
@@ -161,6 +164,10 @@ public class MenuManagement {
 
     public static boolean deleteMenu(Scanner sc) {
         int id = InputMethod.getInt(sc, "Nhập id muốn xoá : ");
+        if(IMenuServiceImpl.getInstance().getById(id) == null) {
+            System.out.println(Constant.INVALID_ID_FOUND);
+            return false;
+        }
         System.out.println("Bạn có chắc chắn muốn xoá : ");
         System.out.println("1. Chắc chắn");
         System.out.println("2. Huỷ");
@@ -171,7 +178,7 @@ public class MenuManagement {
             case 2:
                 break;
             default:
-                System.out.println("Lựa chọn không phù hợp!");
+                System.out.println(Constant.INVALID_CHOICE);
                 break;
         }
         return false;
@@ -183,8 +190,10 @@ public class MenuManagement {
             System.out.println("Danh sách thực đơn rỗng!");
             return;
         }
-        for (Menu_Item menu : listMenu) {
-            System.out.printf("Id : %d | Name : %s | Price : %.2f | Status : %s | Categories : %s\n", menu.getId(), menu.getName(), menu.getPrice(), (menu.isStatus() ? "Đang hoạt động" : "Ngừng hoạt động"), menu.getCategories().getName());
+        Menu_Item.tableHeader();
+        for (Menu_Item menuItem : listMenu) {
+            menuItem.displayDataCustomer();
+            System.out.println("+-------------------------------------------------------------------------+");
         }
     }
 
@@ -194,9 +203,10 @@ public class MenuManagement {
         if(listMenu == null || listMenu.isEmpty()){
             return;
         }
-        for (Menu_Item menu : listMenu) {
-            System.out.printf("Id : %d | Name : %s | Price : %.2f | Status : %s | Categories : %s\n", menu.getId(), menu.getName(), menu.getPrice(), (menu.isStatus() ? "Đang hoạt động" : "Ngừng hoạt động"), menu.getCategories().getName());
+        Menu_Item.tableHeader();
+        for (Menu_Item menuItem : listMenu) {
+            menuItem.displayDataCustomer();
+            System.out.println("+-------------------------------------------------------------------------+");
         }
-
     }
 }

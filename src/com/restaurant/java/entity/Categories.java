@@ -44,7 +44,14 @@ public class Categories {
         this.status = status;
     }
 
-    public void input(Scanner sc){
-        setName(InputMethod.getString(sc,"Nhập tên danh mục : "));
+    public static void tableHeader() {
+        System.out.println("+--------------------------------+");
+        System.out.printf("|%-10s|%-15s|%-10s|\n","ID","Name","Status");
+        System.out.println("+--------------------------------+");
+    }
+
+    public void displayData(){
+        System.out.printf("|%-10s|%-15s|%-10s|\n",this.id,this.name,(this.status ? "Đang hoạt động" : "Ngừng hoạt động"));
+        System.out.println("+--------------------------------+");
     }
 }

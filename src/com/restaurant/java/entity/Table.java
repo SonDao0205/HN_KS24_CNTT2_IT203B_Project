@@ -55,8 +55,14 @@ public class Table {
         this.status = status;
     }
 
-    public void input(Scanner sc){
-        setNumber(InputMethod.getString(sc,"Nhập số của bàn : "));
-        setCapacity(InputMethod.getInt(sc,"Nhập số lượng người tối đa của bàn : "));
+    public static void tableHeader(){
+        System.out.println("+--------------------------------+");
+        System.out.printf("|%-10s|%-10s|%-10s|\n","ID", "Number","Capacity");
+        System.out.println("+--------------------------------+");
+    }
+
+    public void displayTableCustomer(){
+        System.out.printf("|%-10d|%-10s|%-10d|\n",this.id, this.number,this.capacity);
+        System.out.println("+--------------------------------+");
     }
 }

@@ -85,7 +85,7 @@ public class IUserServiceImpl implements IAuthService, IUserService {
             return false;
         }
         if(getById(id) == null){
-            System.out.println(Constant.YELLOW_CODE + "Id người dùng không hợp lệ!" + Constant.RESET_CODE);
+            System.out.println(Constant.INVALID_ID_FOUND);
 
             return false;
         }

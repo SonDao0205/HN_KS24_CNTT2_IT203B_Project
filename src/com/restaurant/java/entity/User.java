@@ -72,4 +72,15 @@ public class User {
     public void setStatus(boolean status) {
         this.status = status;
     }
+
+    public static void tableHeader() {
+        System.out.println("+-----------------------------------------------------+");
+        System.out.printf("|%-5s|%-20s|%-10s|%-15s|\n","ID", "Username","Role","Status");
+        System.out.println("+-----------------------------------------------------+");
+    }
+
+    public void displayData(){
+        System.out.printf("|%-5d|%-20s|%-10s|%-15s|\n",this.id, this.username,this.role,(this.status ? "Đang hoạt động" : "Ngừng hoạt động"));
+        System.out.println("+-----------------------------------------------------+");
+    }
 }

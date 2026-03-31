@@ -3,6 +3,7 @@ package com.restaurant.java.presentation;
 import com.restaurant.java.entity.Order_Item;
 import com.restaurant.java.entity.enums.OrderItemEnum;
 import com.restaurant.java.service.IOrderServiceImpl;
+import com.restaurant.java.utils.Constant;
 import com.restaurant.java.utils.InputMethod;
 import com.restaurant.java.utils.UserSession;
 
@@ -41,7 +42,7 @@ public class ChefMenu {
                     }
                     break;
                 default:
-                    System.out.println("Lựa chọn không phù hợp!");
+                    System.out.println(Constant.INVALID_CHOICE);
                     break;
             }
         } while (choice != 0);
@@ -74,13 +75,25 @@ public class ChefMenu {
         if(id == 0){
             return;
         }
-        OrderItemEnum status = IOrderServiceImpl.getInstance().getOrderItemStatus(id);
+        OrderItemEnum status = null;
+        for (Order_Item orderItem : orderItemList) {
+            if(orderItem.getId() == id){
+                status = orderItem.getStatus();
+            }
+        }
+
         if (status == null) {
-            System.out.println("Không tìm thấy đơn với id này!");
+            System.out.println(Constant.INVALID_ID_FOUND);
             return;
         }
         if(status == OrderItemEnum.cancel) {
             System.out.println("Đơn này đã bị huỷ! Không thể cập nhật!");
+            return;
+        }else if(status == OrderItemEnum.served){
+            System.out.println("Đơn này đã được phục vụ!");
+            return;
+        }else if(status == OrderItemEnum.waiting){
+            System.out.println("Đơn này chưa được duyệt!");
             return;
         }
         OrderItemEnum nextStatus = switch (status) {
@@ -97,15 +110,15 @@ public class ChefMenu {
         switch (choice) {
             case 1:
                 if (IOrderServiceImpl.getInstance().updateOrderItemStatus(id, status)) {
-                    System.out.println("Cập nhật thành công!");
+                    System.out.println(Constant.GREEN_CODE + "Cập nhật thành công!" + Constant.RESET_CODE);
                 } else {
-                    System.out.println("Cập nhật thất bại!");
+                    System.out.println(Constant.RED_CODE + "Cập nhật thất bại!" + Constant.RESET_CODE);
                 }
                 return;
             case 2:
                 return;
             default:
-                System.out.println("Lựa chọn không phù hợp!");
+                System.out.println(Constant.INVALID_CHOICE);
                 return;
         }
 

@@ -8,4 +8,5 @@ public class Constant {
     public static final String INPUT_ERR_MGS = RED_CODE + "Dữ liệu nhập vào không hợp lệ! Nhập lại!" + RESET_CODE;
     public static final String VARIABLE_ERR_MGS = RED_CODE + "Dữ liệu không hợp lệ!" + RESET_CODE;
     public static final String INVALID_ID_FOUND = YELLOW_CODE + "Không tìm thấy phần tử với id này!" + RESET_CODE;
+    public static final String INVALID_CHOICE = YELLOW_CODE + "Lựa chọn không phù hợp!" + RESET_CODE;
 }

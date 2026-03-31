@@ -2,6 +2,7 @@ package com.restaurant.java.presentation;
 
 import com.restaurant.java.entity.Categories;
 import com.restaurant.java.service.ICategoriesServiceImpl;
+import com.restaurant.java.utils.Constant;
 import com.restaurant.java.utils.InputMethod;
 
 import java.util.List;
@@ -25,23 +26,23 @@ public class CategoriesManagement {
             switch (choice){
                 case 1:
                     if(insertCategory(sc)){
-                        System.out.println("Thêm danh mục thành công!");
+                        System.out.println(Constant.GREEN_CODE + "Thêm danh mục thành công!" + Constant.RESET_CODE);
                     }else{
-                        System.out.println("Thêm danh mục thất bại!");
+                        System.out.println(Constant.RED_CODE + "Thêm danh mục thất bại!" + Constant.RESET_CODE);
                     }
                     break;
                 case 2:
                     if(updateCategory(sc)){
-                        System.out.println("Cập nhật thành công!");
+                        System.out.println(Constant.GREEN_CODE + "Cập nhật thành công!" + Constant.RESET_CODE);
                     }else{
-                        System.out.println("Cập nhật thất bại!");
+                        System.out.println(Constant.RED_CODE + "Cập nhật thất bại!" + Constant.RESET_CODE);
                     }
                     break;
                 case 3:
                     if(deleteCategory(sc)){
-                        System.out.println("Xoá danh mục thành công!");
+                        System.out.println(Constant.GREEN_CODE + "Xoá danh mục thành công!" + Constant.RESET_CODE);
                     }else{
-                        System.out.println("Xoá danh mục thất bại!");
+                        System.out.println(Constant.RED_CODE + "Xoá danh mục thất bại!" + Constant.RESET_CODE);
                     }
                     break;
                 case 4:
@@ -50,7 +51,7 @@ public class CategoriesManagement {
                 case 0:
                     break;
                 default:
-                    System.out.println("Lựa chọn không phù hợp!");
+                    System.out.println(Constant.INVALID_CHOICE);
                     break;
             }
         }while(choice != 0);
@@ -73,8 +74,9 @@ public class CategoriesManagement {
             return;
         }
         System.out.println("Danh sách danh mục : ");
+        Categories.tableHeader();
         for (Categories categories : categoriesList) {
-            System.out.printf("|Id : %d | Name : %s | Status : %s |\n ",categories.getId(),categories.getName(),(categories.isStatus() ? "Đang hoạt động" : "Ngừng hoạt động"));
+            categories.displayData();
         }
     }
 
@@ -82,9 +84,12 @@ public class CategoriesManagement {
         int id = InputMethod.getInt(sc,"Nhập id danh mục muốn sửa : ");
         Categories categories = ICategoriesServiceImpl.getInstance().getById(id);
         if(categories == null){
-            System.out.println("Không tìm thấy danh mục phù hợp!");
+            System.out.println(Constant.INVALID_ID_FOUND);
             return false;
         }
+        System.out.println("Dữ liệu cũ : ");
+        Categories.tableHeader();
+        categories.displayData();
         System.out.println("Cập nhật dữ liệu : ");
         String name = InputMethod.getString(sc,"Nhập tên mới : ");
         return ICategoriesServiceImpl.getInstance().update(id,name);

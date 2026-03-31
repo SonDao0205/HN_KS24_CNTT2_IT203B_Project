@@ -2,6 +2,7 @@ package com.restaurant.java.service;
 
 import com.restaurant.java.dao.CategoriesDao;
 import com.restaurant.java.entity.Categories;
+import com.restaurant.java.utils.Constant;
 
 import java.util.List;
 
@@ -22,7 +23,8 @@ public class ICategoriesServiceImpl implements ICategoriesService {
     @Override
     public boolean insert(Categories categories) {
         if(categories==null){
-            throw new RuntimeException("Dữ liệu không hợp lệ!");
+            System.out.println(Constant.VARIABLE_ERR_MGS);
+            return false;
         }
         return categoriesDao.insert(categories);
     }
@@ -30,7 +32,8 @@ public class ICategoriesServiceImpl implements ICategoriesService {
     @Override
     public boolean update(int id, String name) {
         if(id <= 0 || name.isEmpty()){
-            throw new RuntimeException("Dữ liệu không hợp lệ!");
+            System.out.println(Constant.VARIABLE_ERR_MGS);
+            return false;
         }
         return categoriesDao.update(id,name);
     }
@@ -38,7 +41,12 @@ public class ICategoriesServiceImpl implements ICategoriesService {
     @Override
     public boolean delete(int id) {
         if(id <= 0){
-            throw new RuntimeException("Dữ liệu không hợp lệ!");
+            System.out.println(Constant.VARIABLE_ERR_MGS);
+            return false;
+        }
+        if(getById(id) == null){
+            System.out.println(Constant.INVALID_ID_FOUND);
+            return false;
         }
         return categoriesDao.delete(id);
     }
@@ -56,7 +64,8 @@ public class ICategoriesServiceImpl implements ICategoriesService {
     @Override
     public Categories getById(int id) {
         if(id <= 0){
-            throw new RuntimeException("Dữ liệu không hợp lệ!");
+            System.out.println(Constant.VARIABLE_ERR_MGS);
+            return null;
         }
         return categoriesDao.getById(id);
     }

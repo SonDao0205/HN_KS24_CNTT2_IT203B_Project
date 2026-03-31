@@ -130,12 +130,13 @@ public class TableDao {
         }
     }
 
-    public List<Table> getListTableAvailable() {
-        String sql = "SELECT * FROM Tables WHERE status = 1 AND status = 'available'";
+    public List<Table> getListTable(TableEnum tableEnum) {
+        String sql = "SELECT * FROM Tables WHERE status = ?";
         try (
                 Connection conn = DatabaseConnection.openConnection();
                 PreparedStatement pstmt = conn.prepareStatement(sql);
         ) {
+            pstmt.setString(1, tableEnum.toString());
             pstmt.executeQuery();
             ResultSet rs = pstmt.executeQuery();
             List<Table> tables = new ArrayList<>();
@@ -168,8 +169,4 @@ public class TableDao {
             return false;
         }
     }
-
-//    public List<Table> getTableByUserId(int user_id){
-//
-//    }
 }

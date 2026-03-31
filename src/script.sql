@@ -18,18 +18,18 @@ status ENUM('available','occupied','reserved','block') default 'available'
 );
 
 CREATE TABLE Categories( -- danh mục
-id int primary key auto_increment,
-name VARCHAR(255) not null,
-status boolean default true
+   id int primary key auto_increment,
+   name VARCHAR(255) not null,
+   status boolean default true
 );
 
 create table Menu_Items( -- món trong thực đơn
-id int primary key auto_increment,
-categories_id int,
-foreign key (categories_id) references Categories(id),
-name varchar(255) not null ,
-price decimal(15,2) not null check ( price > 0 ),
-status BOOLEAN default true
+   id int primary key auto_increment,
+   categories_id int,
+   foreign key (categories_id) references Categories(id),
+   name varchar(255) not null ,
+   price decimal(15,2) not null check ( price > 0 ),
+   status BOOLEAN default true
 );
 
 
@@ -45,11 +45,13 @@ created_at datetime default current_timestamp
 );
 
 create table Order_Items( -- chi tiết sản phẩm trong phiếu đặt hàng
-id int primary key auto_increment,
-order_id int,
-menu_item int,
-unit_price decimal(15,2) not null check ( unit_price > 0 ),
-quantity int not null check ( quantity > 0 ),
-status enum('pending','cooking','ready','served','cancel') default 'pending',
-note varchar(255)
+    id int primary key auto_increment,
+    order_id int,
+    menu_item int,
+    unit_price decimal(15,2) not null check ( unit_price > 0 ),
+    quantity int not null check ( quantity > 0 ),
+    status enum('waiting','pending','cooking','ready','served','cancel') default 'waiting',
+    note varchar(255),
+    foreign key(order_id) references Orders(id),
+    foreign key(menu_item) references Menu_Items(id)
 );

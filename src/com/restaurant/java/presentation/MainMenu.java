@@ -1,6 +1,7 @@
 package com.restaurant.java.presentation;
 
 import com.restaurant.java.service.IUserServiceImpl;
+import com.restaurant.java.utils.Constant;
 import com.restaurant.java.utils.InputMethod;
 
 import java.util.Scanner;
@@ -21,7 +22,7 @@ public class MainMenu {
             switch (choice) {
                 case 1 -> AuthenticationMenu.printLoginMenu(sc);
                 case 2 -> AuthenticationMenu.printRegisterMenu(sc);
-                default -> System.out.println("Lựa chọn không phù hợp!");
+                default -> System.out.println(Constant.INVALID_CHOICE);
             }
         }while(choice != 0);
     }

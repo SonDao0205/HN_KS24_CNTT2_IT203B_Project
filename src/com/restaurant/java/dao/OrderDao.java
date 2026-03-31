@@ -78,14 +78,13 @@ public class OrderDao {
                   FROM Orders o
                   JOIN Tables t ON t.id = o.table_id
                   JOIN Users u ON u.id = o.customer_id
-                  WHERE customer_id = ? AND table_id = ?
+                  WHERE table_id = ? AND o.status = 'pending'
                 """;
         try (
                 Connection conn = DatabaseConnection.openConnection();
                 PreparedStatement pstmt = conn.prepareStatement(sql);
         ) {
-            pstmt.setInt(1, user_id);
-            pstmt.setInt(2, table_id);
+            pstmt.setInt(1, table_id);
             ResultSet rs = pstmt.executeQuery();
             if (rs.next()) {
                 User user = new User(
@@ -199,6 +198,50 @@ public class OrderDao {
         }
     }
 
+    public List<Order_Item> getAllOrderItems(int table_id, Order item) {
+        String sql = """
+                 SELECT
+                oi.id as od_id, oi.menu_item as od_item, oi.unit_price as od_price, oi.quantity as od_quantity, oi.status as od_status , oi.note as od_note,
+                m.id as m_id, m.name as m_name, m.price as m_price, m.status as m_status
+                FROM Orders o
+                JOIN Order_Items oi ON oi.order_id = o.id
+                JOIN Menu_Items m ON m.id = oi.menu_item
+                WHERE o.table_id = ? AND oi.status = 'waiting'""";
+
+        try (
+                Connection conn = DatabaseConnection.openConnection();
+                PreparedStatement pstmt = conn.prepareStatement(sql);
+        ) {
+            pstmt.setInt(1, table_id);
+            ResultSet rs = pstmt.executeQuery();
+            List<Order_Item> order_items = new ArrayList<>();
+            while (rs.next()) {
+                Menu_Item menu_item = new Menu_Item(
+                        rs.getInt("m_id"),
+                        null,
+                        rs.getString("m_name"),
+                        rs.getDouble("m_price"),
+                        rs.getBoolean("m_status")
+                );
+
+                order_items.add(new Order_Item(
+                        rs.getInt("od_id"),
+                        item,
+                        menu_item,
+                        rs.getDouble("od_price"),
+                        rs.getInt("od_quantity"),
+                        OrderItemEnum.valueOf(rs.getString("od_status")),
+                        rs.getString("od_note")
+                ));
+            }
+            return order_items;
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.out.println("Lỗi khi lấy chi tiết order");
+            return null;
+        }
+    }
+
     public OrderItemEnum getOrderItemStatus(int order_item_id) {
         String sql = """
                 SELECT *
@@ -299,7 +342,7 @@ public class OrderDao {
                 FROM Order_Items oi
                 JOIN Orders o ON oi.order_id = o.id
                 JOIN Menu_Items m ON oi.menu_item = m.id
-                WHERE oi.status <> ?
+                WHERE oi.status <> ? AND oi.status <> ?
                 """;
 
         try (
@@ -307,6 +350,7 @@ public class OrderDao {
                 PreparedStatement pstmt = conn.prepareStatement(sql)
         ) {
             pstmt.setString(1, OrderItemEnum.cancel.name());
+            pstmt.setString(2, OrderItemEnum.waiting.name());
             ResultSet rs = pstmt.executeQuery();
 
             while (rs.next()) {

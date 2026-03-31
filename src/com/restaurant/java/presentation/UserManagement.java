@@ -5,6 +5,7 @@ import com.restaurant.java.entity.enums.UserRoleEnum;
 import com.restaurant.java.service.ITableServiceImpl;
 import com.restaurant.java.service.IUserService;
 import com.restaurant.java.service.IUserServiceImpl;
+import com.restaurant.java.utils.Constant;
 import com.restaurant.java.utils.InputMethod;
 
 import java.util.List;
@@ -29,9 +30,9 @@ public class UserManagement {
             switch (choice) {
                 case 1:
                     if (insertUser(sc)) {
-                        System.out.println("Thêm tài khoản thành công!");
+                        System.out.println(Constant.GREEN_CODE + "Thêm tài khoản thành công!" + Constant.RESET_CODE);
                     } else {
-                        System.out.println("Thêm tài khoản thất bại");
+                        System.out.println(Constant.RED_CODE + "Thêm tài khoản thất bại" + Constant.RESET_CODE);
                     }
                     break;
                 case 2:
@@ -39,16 +40,16 @@ public class UserManagement {
                     break;
                 case 3:
                     if (deleteUser(sc)) {
-                        System.out.println("Thêm tài khoản thành công!");
+                        System.out.println(Constant.GREEN_CODE + "Xoá tài khoản thành công!" + Constant.RESET_CODE);
                     } else {
-                        System.out.println("Thêm tài khoản thất bại");
+                        System.out.println(Constant.RED_CODE + "Xoá tài khoản thất bại" + Constant.RESET_CODE);
                     }
                     break;
                 case 4:
                     if (blockUser(sc)) {
-                        System.out.println("Khoá tài khoản thành công!");
+                        System.out.println(Constant.GREEN_CODE + "Khoá tài khoản thành công!" + Constant.RESET_CODE);
                     } else {
-                        System.out.println("Khoá tài khoản thất bại!");
+                        System.out.println(Constant.RED_CODE + "Khoá tài khoản thất bại!" + Constant.RESET_CODE);
                     }
                     break;
                 case 5:
@@ -57,7 +58,7 @@ public class UserManagement {
                 case 0:
                     break;
                 default:
-                    System.out.println("Lựa chọn không phù hợp!");
+                    System.out.println(Constant.INVALID_CHOICE);
                     break;
             }
         } while (choice != 0);
@@ -83,7 +84,7 @@ public class UserManagement {
                 case 2:
                     return UserRoleEnum.chef;
                 default:
-                    System.out.println("Lựa chọn không phù hợp!");
+                    System.out.println(Constant.INVALID_CHOICE);
                     break;
             }
         } while (true);
@@ -93,9 +94,12 @@ public class UserManagement {
         int id = InputMethod.getInt(sc, "Nhập id tài khoản muốn sửa : ");
         User user = IUserServiceImpl.getInstance().getById(id);
         if (user == null) {
-            System.out.println("Id không hợp lệ!");
+            System.out.println(Constant.INVALID_ID_FOUND);
             return;
         }
+        System.out.println("Dữ liệu cũ : ");
+        User.tableHeader();
+        user.displayData();
         int choice;
         do {
             System.out.println("Danh sách các thông tin sửa : ");
@@ -118,16 +122,16 @@ public class UserManagement {
                     break;
                 case 3:
                     if (IUserServiceImpl.getInstance().update(user)) {
-                        System.out.println("Cập nhật thông tin thành công!");
+                        System.out.println(Constant.GREEN_CODE + "Cập nhật thông tin thành công!" + Constant.RESET_CODE);
                     } else {
-                        System.out.println("Cập nhật thông tin thất bại!");
+                        System.out.println(Constant.RED_CODE + "Cập nhật thông tin thất bại!" + Constant.RESET_CODE);
                     }
                     return;
                 case 4:
                     System.out.println("Đã huỷ các thay đổi!");
                     return;
                 default:
-                    System.out.println("Lựa chọn không phù hợp!");
+                    System.out.println(Constant.INVALID_CHOICE);
                     break;
             }
         } while (true);
@@ -135,6 +139,10 @@ public class UserManagement {
 
     public static boolean deleteUser(Scanner sc) {
         int id = InputMethod.getInt(sc, "Nhập id tài khoản muốn xoá : ");
+        if(IUserServiceImpl.getInstance().getById(id) == null) {
+            System.out.println(Constant.INVALID_ID_FOUND);
+            return false;
+        }
         System.out.println("Bạn có chắc chắn muốn xoá : ");
         System.out.println("1. Chắc chắn");
         System.out.println("2. Huỷ");
@@ -145,7 +153,7 @@ public class UserManagement {
             case 2:
                 break;
             default:
-                System.out.println("Lựa chọn không phù hợp!");
+                System.out.println(Constant.INVALID_CHOICE);
                 break;
         }
         return false;
@@ -158,8 +166,9 @@ public class UserManagement {
             return;
         }
         System.out.println("Danh sách tất cả tài khoản :");
+        User.tableHeader();
         for (User user : users) {
-            System.out.printf("Id : %d | Username : %s | Role : %s | Status : %s |\n", user.getId(), user.getUsername(), user.getRole(), (user.isStatus() ? "Đang hoạt động" : "Ngừng hoạt động"));
+            user.displayData();
         }
     }
 
@@ -167,7 +176,7 @@ public class UserManagement {
         int id = InputMethod.getInt(sc, "Nhập id của người dùng muốn khoá : ");
         User user = IUserServiceImpl.getInstance().getById(id);
         if (user == null) {
-            System.out.println("Không tìm thấy người dùng hợp lệ!");
+            System.out.println(Constant.INVALID_ID_FOUND);
             return false;
         }
         System.out.println("Bạn có chắc chắn muốn khoá người dùng này : ");
@@ -178,7 +187,7 @@ public class UserManagement {
             case 1 -> IUserServiceImpl.getInstance().blockUser(user);
             case 2 -> false;
             default -> {
-                System.out.println("Lựa chọn không phù hợp!");
+                System.out.println(Constant.INVALID_CHOICE);
                 yield false;
             }
         };

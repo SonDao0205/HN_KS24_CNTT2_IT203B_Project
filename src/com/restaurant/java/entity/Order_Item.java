@@ -81,4 +81,14 @@ public class Order_Item {
     public void setNote(String note) {
         this.note = note;
     }
+
+    public static void tableHeader(){
+        System.out.println("+--------------------------------------------------------------------------+");
+        System.out.printf("|%-10s|%-25s|%-10s|%-10s|%-15s|\n","ID","Name","Price","Quantity","Status");
+        System.out.println("+--------------------------------------------------------------------------+");
+    }
+
+    public void displayDataCustomer(){
+        System.out.printf("|%-10d|%-25s|%-10.2f|%-10d|%-15s|\n",this.id,this.getMenu_item().getName(),this.unit_price,this.quantity,this.status);
+    }
 }

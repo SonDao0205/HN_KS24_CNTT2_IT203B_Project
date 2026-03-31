@@ -47,6 +47,14 @@ public class IOrderServiceImpl implements IOrderService {
         return  orderDao.getOrderItems(user_id, table_id, order);
     }
 
+    public List<Order_Item> getAllOrderItems(int table_id, Order order) {
+        if(table_id <= 0 || order == null) {
+            System.out.println("Dữ liệu không hợp lệ!");
+            return null;
+        }
+        return  orderDao.getAllOrderItems(table_id, order);
+    }
+
     @Override
     public boolean cancelOrderItem(int order_item_id) {
         if (order_item_id <= 0) {
@@ -55,13 +63,13 @@ public class IOrderServiceImpl implements IOrderService {
         }
         OrderItemEnum status = orderDao.getOrderItemStatus(order_item_id);
         if(status == null) {
-            System.out.println("Không tìm thấy món!");
+            System.out.println(Constant.INVALID_ID_FOUND);
             return false;
         }
-        if(status.equals(OrderItemEnum.pending)) {
+        if(status.equals(OrderItemEnum.pending) ||  status.equals(OrderItemEnum.waiting)) {
             return orderDao.cancelOrderItem(order_item_id);
         } else if (status.equals(OrderItemEnum.cancel)) {
-            System.out.println("Món đã bị huỷ!");
+            System.out.println("Món này đã bị huỷ!");
             return false;
         } else{
             System.out.println("Món đang được xử lý, không thể huỷ!");
@@ -183,4 +191,6 @@ public class IOrderServiceImpl implements IOrderService {
             default -> false;
         };
     }
+
+//    public List<Order_Item>
 }

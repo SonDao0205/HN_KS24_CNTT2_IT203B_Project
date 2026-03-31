@@ -1,5 +1,6 @@
 package com.restaurant.java.presentation;
 
+import com.restaurant.java.utils.Constant;
 import com.restaurant.java.utils.InputMethod;
 import com.restaurant.java.utils.UserSession;
 
@@ -16,7 +17,8 @@ public class ManagerMenu {
                     | 1. Quản lý menu                       |
                     | 2. Quản lý danh mục                   |
                     | 3. Quản lý bàn ăn                     |
-                    | 4. Quản lý người dùng                 |
+                    | 4. Duyệt order                        |
+                    | 5. Quản lý người dùng                 |
                     | 0. Thoát                              |
                     +---------------------------------------+""");
             choice = InputMethod.getInt(sc,"Lựa chọn của bạn : ");
@@ -31,6 +33,9 @@ public class ManagerMenu {
                     TableManagement.printMenu(sc);
                     break;
                 case 4:
+                    OrderManagement.approveOrder(sc);
+                    break;
+                case 5:
                     UserManagement.printMenu(sc);
                     break;
                 case 0:
@@ -44,7 +49,7 @@ public class ManagerMenu {
                     }
                     break;
                 default:
-                    System.out.println("Lựa chọn không phù hợp!");
+                    System.out.println(Constant.INVALID_CHOICE);
                     break;
             }
         }while(choice != 0);

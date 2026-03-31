@@ -74,8 +74,13 @@ public class Menu_Item {
         this.status = status;
     }
 
-    public void input(Scanner sc){
-        setName(InputMethod.getString(sc,"Nhập tên món : "));
-        setPrice(InputMethod.getDouble(sc,"Nhập giá món : "));
+    public static void tableHeader() {
+        System.out.println("+-------------------------------------------------------------------------+");
+        System.out.printf("|%-10s|%-25s|%-15s|%-20s|\n","ID", "Name","Price","Danh mục");
+        System.out.println("+-------------------------------------------------------------------------+");
+    }
+
+    public void displayDataCustomer(){
+        System.out.printf("|%-10d|%-25s|%-15.2f|%-20s|\n",this.id, this.name,this.price,this.getCategories().getName());
     }
 }

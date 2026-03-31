@@ -3,6 +3,7 @@ package com.restaurant.java.presentation;
 import com.restaurant.java.entity.Table;
 import com.restaurant.java.service.IMenuServiceImpl;
 import com.restaurant.java.service.ITableServiceImpl;
+import com.restaurant.java.utils.Constant;
 import com.restaurant.java.utils.InputMethod;
 
 import java.util.List;
@@ -26,9 +27,9 @@ public class TableManagement {
             switch (choice) {
                 case 1:
                     if (insertTable(sc)){
-                        System.out.println("Thêm bàn thành công!");
+                        System.out.println(Constant.GREEN_CODE + "Thêm bàn thành công!" + Constant.RESET_CODE);
                     }else{
-                        System.out.println("Thêm bàn thất bại!");
+                        System.out.println(Constant.RED_CODE + "Thêm bàn thất bại!" + Constant.RESET_CODE);
                     }
                     break;
                 case 2:
@@ -36,9 +37,9 @@ public class TableManagement {
                     break;
                 case 3:
                     if (deleteTable(sc)){
-                        System.out.println("Xoá bàn thành công!");
+                        System.out.println(Constant.GREEN_CODE + "Xoá bàn thành công!" + Constant.RESET_CODE);
                     }else{
-                        System.out.println("Xoá bàn thất bại!");
+                        System.out.println(Constant.RED_CODE + "Xoá bàn thất bại!" + Constant.RESET_CODE);
                     }
                     break;
                 case 4:
@@ -47,7 +48,7 @@ public class TableManagement {
                 case 0:
                     break;
                 default:
-                    System.out.println("Lựa chọn không phù hợp!");
+                    System.out.println(Constant.INVALID_CHOICE);
                     break;
             }
         } while (choice != 0);
@@ -80,9 +81,12 @@ public class TableManagement {
         int id = InputMethod.getInt(sc,"Nhập id của bàn muốn sửa : ");
         Table table = ITableServiceImpl.getInstance().getById(id);
         if(table == null) {
-            System.out.println("Không tìm thấy bàn hợp lệ!");
+            System.out.println(Constant.INVALID_ID_FOUND);
             return;
         }
+        System.out.println("Dữ liệu cũ : ");
+        Table.tableHeader();
+        table.displayTableCustomer();
         int choice;
         while(true){
             System.out.println("Danh sách các thông tin sửa : ");
@@ -98,7 +102,7 @@ public class TableManagement {
                         System.out.println("Số định danh bàn đã tồn tại!");
                     }else{
                         table.setNumber(number);
-                        System.out.println("Cập nhật thành công!");
+                        System.out.println(Constant.GREEN_CODE + "Cập nhật thành công!" + Constant.RESET_CODE);
                     }
                     break;
                 case 2:
@@ -109,22 +113,24 @@ public class TableManagement {
                             System.out.println("Số lượng chứa của bản không được nhỏ hơn 0! Nhập lại!");
                         }else{
                             table.setCapacity(capacity);
-                            System.out.println("Cập nhật thành công!");
+                            System.out.println(Constant.GREEN_CODE + "Cập nhật thành công!" + Constant.RESET_CODE);
                         }
                     } while (capacity <= 0);
                     break;
                 case 3:
                       if(ITableServiceImpl.getInstance().update(table)){
-                          System.out.println("Cập nhật thông tin thành công!");
+                          System.out.println(Constant.GREEN_CODE + "Cập nhật thông tin thành công!" + Constant.RESET_CODE);
+                          System.out.println();
                           return;
                       }else{
-                          System.out.println("Cập nhật thông tin thất bại!");
+                          System.out.println(Constant.RED_CODE + "Cập nhật thông tin thất bại!" + Constant.RESET_CODE);
+                          System.out.println();
                       }
                 case 4:
                     System.out.println("Đã huỷ các thay đổi!");
                     return;
                 default:
-                    System.out.println("Lựa chọn không hợp lệ!");
+                    System.out.println(Constant.INVALID_CHOICE);
                     break;
             }
         }
@@ -142,7 +148,7 @@ public class TableManagement {
             case 2:
                 break;
             default:
-                System.out.println("Lựa chọn không phù hợp!");
+                System.out.println(Constant.INVALID_CHOICE);
                 break;
         }
         return false;
@@ -154,8 +160,9 @@ public class TableManagement {
             return;
         }
         System.out.println("Danh sách các bàn hiện tại!");
+        Table.tableHeader();
         for(Table table : tableList) {
-            System.out.printf("Id : %d | Number : %s | Capacity : %d | Status : %s |\n",table.getId(),table.getNumber(),table.getCapacity(),table.getStatus());
+            table.displayTableCustomer();
         }
     }
 

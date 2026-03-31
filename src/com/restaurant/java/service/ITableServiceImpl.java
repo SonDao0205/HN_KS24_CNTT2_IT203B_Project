@@ -48,11 +48,11 @@ public class ITableServiceImpl implements ITableService {
     @Override
     public boolean delete(int id) {
         if(id <= 0){
-            System.out.println(Constant.YELLOW_CODE + "Id không hợp lệ!" + Constant.RESET_CODE);
+            System.out.println(Constant.INVALID_ID_FOUND);
             return false;
         }
         if(getById(id) == null){
-            System.out.println(Constant.YELLOW_CODE + "Không tìm thấy bàn hợp lệ!" + Constant.RESET_CODE);
+            System.out.println(Constant.INVALID_ID_FOUND);
             return false;
         }
         return tableDao.delete(id);
@@ -61,7 +61,7 @@ public class ITableServiceImpl implements ITableService {
     @Override
     public Table getById(int id) {
         if(id <= 0){
-            System.out.println(Constant.YELLOW_CODE + "Id không hợp lệ!" + Constant.RESET_CODE);
+            System.out.println(Constant.INVALID_ID_FOUND);
             return null;
         }
         return tableDao.getById(id);
@@ -83,9 +83,18 @@ public class ITableServiceImpl implements ITableService {
 
     @Override
     public List<Table> getTableAvailable() {
-        List<Table> tableList = tableDao.getListTableAvailable();
+        List<Table> tableList = tableDao.getListTable(TableEnum.available);
         if(tableList == null || tableList.isEmpty()){
-            System.out.println(Constant.YELLOW_CODE + "Danh sách bàn trống!" + Constant.RESET_CODE);
+            System.out.println(Constant.YELLOW_CODE + "Danh sách bàn trống rỗng!" + Constant.RESET_CODE);
+            return null;
+        }
+        return tableList;
+    }
+
+    public List<Table> getTableOccupied(){
+        List<Table> tableList = tableDao.getListTable(TableEnum.occupied);
+        if(tableList == null || tableList.isEmpty()){
+            System.out.println(Constant.YELLOW_CODE + "Danh sách bàn trống rỗng!" + Constant.RESET_CODE);
             return null;
         }
         return tableList;

@@ -3,6 +3,7 @@ package com.restaurant.java.dao;
 import com.restaurant.java.entity.User;
 import com.restaurant.java.entity.enums.UserRoleEnum;
 import com.restaurant.java.exception.AccountLockException;
+import com.restaurant.java.utils.Constant;
 import com.restaurant.java.utils.DatabaseConnection;
 import com.restaurant.java.utils.PasswordHased;
 import org.mindrot.jbcrypt.BCrypt;
@@ -78,22 +79,24 @@ public class UserDao {
         User user = findByUsername(username);
 
         if (user == null) {
-            throw new Exception("Tên tài khoản hoặc mật khẩu không chính xác!");
+            throw new Exception(Constant.RED_CODE + "Tên tài khoản hoặc mật khẩu không chính xác!" + Constant.RESET_CODE);
+
         }
 
         if (!user.isStatus()) {
-            throw new AccountLockException("Tài khoản đã bị khoá!");
+            throw new AccountLockException(Constant.RED_CODE + "Tài khoản đã bị khoá!" + Constant.RESET_CODE);
+
         }
 
         if (!PasswordHased.checkPassword(password, user.getPassword())) {
-            throw new Exception("Tài khoản hoặc mật khẩu không chính xác!");
+            throw new Exception(Constant.RED_CODE + "Tài khoản hoặc mật khẩu không chính xác!" + Constant.RESET_CODE);
         }
         return user;
     }
 
     public boolean register(String username, String password) {
         if (findByUsername(username) != null) {
-            throw new RuntimeException("Tên tài khoản đã tồn tại");
+            throw new RuntimeException(Constant.RED_CODE + "Tên tài khoản đã tồn tại" + Constant.RESET_CODE);
         }
 
         String sql = "INSERT INTO Users (username, password,role) VALUES (?, ?,?)";
