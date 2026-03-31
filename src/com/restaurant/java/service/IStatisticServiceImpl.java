@@ -1,7 +1,9 @@
 package com.restaurant.java.service;
 
+import com.restaurant.java.dao.StatisticDao;
 import com.restaurant.java.entity.Menu_Item;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 public class IStatisticServiceImpl implements IStatisticService {
@@ -16,11 +18,11 @@ public class IStatisticServiceImpl implements IStatisticService {
 
     @Override
     public void revenueByMonth() {
-
+        System.out.printf("Doanh thu của tháng %d : %.2f\n", LocalDateTime.now().getMonthValue(), StatisticDao.getInstance().revenueByMonth(LocalDateTime.now().getMonthValue(),LocalDateTime.now().getYear()));
     }
 
     @Override
-    public List<Menu_Item> bestSelling() {
-        return List.of();
+    public void bestSelling() {
+        StatisticDao.getInstance().bestSeller();
     }
 }

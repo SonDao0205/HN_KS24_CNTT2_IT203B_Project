@@ -6,5 +6,5 @@ import java.util.List;
 
 public interface IStatisticService {
     public void revenueByMonth();
-    public List<Menu_Item> bestSelling();
+    public void bestSelling();
 }

@@ -1,5 +1,6 @@
 package com.restaurant.java.presentation;
 
+import com.restaurant.java.service.IStatisticServiceImpl;
 import com.restaurant.java.utils.Constant;
 import com.restaurant.java.utils.InputMethod;
 
@@ -19,6 +20,12 @@ public class StatisticManagement {
                     +---------------------------------------+""");
             choice = InputMethod.getInt(sc,"Lựa chọn của bạn : ");
             switch (choice) {
+                case 1:
+                    IStatisticServiceImpl.getInstance().revenueByMonth();
+                    break;
+                case 2:
+                    IStatisticServiceImpl.getInstance().bestSelling();
+                    break;
                 case 0:
                     break;
                 default:

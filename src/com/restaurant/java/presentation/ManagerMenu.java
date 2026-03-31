@@ -20,6 +20,7 @@ public class ManagerMenu {
                     | 4. Duyệt order                        |
                     | 5. Quản lý người dùng                 |
                     | 6. Danh sách các đánh giá             |
+                    | 7. Thống kê                           |
                     | 0. Thoát                              |
                     +---------------------------------------+""");
             choice = InputMethod.getInt(sc,"Lựa chọn của bạn : ");
@@ -41,6 +42,9 @@ public class ManagerMenu {
                     break;
                 case 6:
                     ReviewManagement.getAllReviews();
+                    break;
+                case 7:
+                    StatisticManagement.printMenu(sc);
                     break;
                 case 0:
                     System.out.println("Bạn có chắc chắn muốn đăng xuất : ");
