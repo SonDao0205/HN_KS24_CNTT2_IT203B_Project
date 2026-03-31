@@ -1,17 +1,13 @@
 package com.restaurant.java.presentation;
 
-import com.restaurant.java.entity.Menu_Item;
-import com.restaurant.java.entity.Order;
-import com.restaurant.java.entity.Order_Item;
-import com.restaurant.java.entity.Table;
-import com.restaurant.java.service.IMenuServiceImpl;
-import com.restaurant.java.service.IOrderService;
-import com.restaurant.java.service.IOrderServiceImpl;
-import com.restaurant.java.service.ITableServiceImpl;
+import com.restaurant.java.entity.*;
+import com.restaurant.java.service.*;
 import com.restaurant.java.utils.Constant;
 import com.restaurant.java.utils.InputMethod;
 import com.restaurant.java.utils.UserSession;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -30,6 +26,8 @@ public class CustomerMenu {
                     | 3. Chọn món                           |
                     | 4. Xem danh sách món đã gọi           |
                     | 5. Huỷ món                            |
+                    | 6. Đánh giá                           |
+                    | 7. Thanh toán                         |
                     | 0. Thoát                              |
                     +---------------------------------------+""");
             choice = InputMethod.getInt(sc, "Lựa chọn của bạn : ");
@@ -48,6 +46,12 @@ public class CustomerMenu {
                     break;
                 case 5:
                     cancelItemOrder(sc);
+                    break;
+                case 6:
+                    handleAddReview(sc);
+                    break;
+                case 7:
+                    handlePay(sc);
                     break;
                 case 0:
                     System.out.println("Bạn có chắc chắn muốn đăng xuất : ");
@@ -182,9 +186,9 @@ public class CustomerMenu {
                         break;
                     case 3:
                         if (!handleCompleteOrder(menuItems, pickOrder, quantity, note)) {
-                            System.out.println(Constant.RED_CODE + "Thêm món thất bại!" +  Constant.RESET_CODE);
+                            System.out.println(Constant.RED_CODE + "Thêm món thất bại!" + Constant.RESET_CODE);
                         } else {
-                            System.out.println(Constant.GREEN_CODE + "Thêm món thành công!" +  Constant.RESET_CODE);
+                            System.out.println(Constant.GREEN_CODE + "Thêm món thành công!" + Constant.RESET_CODE);
                         }
                         return;
                     default:
@@ -218,7 +222,7 @@ public class CustomerMenu {
                 switch (choice) {
                     case 1:
                         menuItems.removeIf(item -> item.getId() == item_id);
-                        System.out.println(Constant.GREEN_CODE + "Huỷ món khỏi giỏ hàng thành công!" +  Constant.RESET_CODE);
+                        System.out.println(Constant.GREEN_CODE + "Huỷ món khỏi giỏ hàng thành công!" + Constant.RESET_CODE);
                         return menuItems;
                     case 2:
                         break;
@@ -292,14 +296,81 @@ public class CustomerMenu {
         switch (choice) {
             case 1:
                 if (IOrderServiceImpl.getInstance().cancelOrderItem(id)) {
-                    System.out.println(Constant.GREEN_CODE +  "Huỷ món thành công!" + Constant.RESET_CODE);
+                    System.out.println(Constant.GREEN_CODE + "Huỷ món thành công!" + Constant.RESET_CODE);
                 } else {
 
-                    System.out.println(Constant.RED_CODE +  "Huỷ món thất bại!" + Constant.RESET_CODE);
+                    System.out.println(Constant.RED_CODE + "Huỷ món thất bại!" + Constant.RESET_CODE);
                 }
                 return;
             case 2:
                 System.out.println("Đã huỷ thao tác!");
+                return;
+            default:
+                System.out.println(Constant.INVALID_CHOICE);
+                return;
+        }
+    }
+
+    public static void handleAddReview(Scanner sc) {
+        String content = InputMethod.getString(sc, "Nhập nội dung đánh giá : ");
+        int star = InputMethod.getInt(sc, "Nhập số sao đánh giá : ");
+        if (star < 0) {
+            System.out.println(Constant.VARIABLE_ERR_MGS);
+            return;
+        }
+        if (IReviewServiceImpl.getInstance().addReview(new Review(content, UserSession.getInstance().getCurrentUser(), star))) {
+            System.out.println(Constant.GREEN_CODE + "Thêm đánh giá thành công!" + Constant.RESET_CODE);
+        } else {
+            System.out.println(Constant.RED_CODE + "Thêm đánh giá thất bại!" + Constant.RESET_CODE);
+        }
+    }
+
+    public static void handlePay(Scanner sc) {
+        if (!printListTableByUser()) {
+            return;
+        }
+        int table_id = InputMethod.getInt(sc, "Nhập id của bàn muốn thanh toán : ");
+        Order pickOrder = IOrderServiceImpl.getInstance().getOrder(UserSession.getInstance().getCurrentUser().getId(), table_id);
+        if (pickOrder == null) {
+            System.out.println(Constant.INVALID_ID_FOUND);
+            return;
+        }
+        List<Order_Item> orderItemsList = IOrderServiceImpl.getInstance().getOrderItems(UserSession.getInstance().getCurrentUser().getId(), table_id, pickOrder);
+
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm dd/MM/yy");
+        System.out.println("-------Hoá Đơn-------");
+        System.out.println("Tên khách hàng : " + pickOrder.getCustomer().getUsername());
+        System.out.println("Số của bàn : " + pickOrder.getTable().getNumber());
+        System.out.println("Giờ vào bàn : "+ pickOrder.getCreated_at().format(formatter));
+        LocalDateTime checkoutAt = LocalDateTime.now();
+        System.out.println("Giờ rời : " + checkoutAt.format(formatter));
+        if (orderItemsList == null || orderItemsList.isEmpty()) {
+            System.out.println("Danh sách các món đã gọi trống! Bạn chưa gọi món!");
+        } else {
+            System.out.println("Danh sách các món đã gọi : ");
+            System.out.println("+--------------------------------------------------------------+");
+            System.out.printf("|%-5s|%-30s|%-10s|%-13s|\n", "STT", "Name", "Quantity", "Đơn giá");
+            System.out.println("+--------------------------------------------------------------+");
+            int i = 1;
+            for (Order_Item orderItem : orderItemsList) {
+                System.out.printf("|%-5d|%-30s|%-10d|%-13.2f|\n", i++, orderItem.getMenu_item().getName(), orderItem.getQuantity(), orderItem.getUnit_price());
+                System.out.println("+--------------------------------------------------------------+");
+            }
+        }
+        System.out.println("Tổng tiền : " + pickOrder.getTotal_amount());
+        System.out.println("Chức năng : ");
+        System.out.println("1. Thanh toán");
+        System.out.println("2. Quay lại");
+        int choice = InputMethod.getInt(sc, "Lựa chọn của bạn : ");
+        switch (choice) {
+            case 1:
+                if (IOrderServiceImpl.getInstance().payOrder(pickOrder,checkoutAt)) {
+                    System.out.println(Constant.GREEN_CODE + "Thanh toán thành công!" + Constant.RESET_CODE);
+                } else {
+                    System.out.println(Constant.RED_CODE + "Thanh toán thất bại!" +  Constant.RESET_CODE);
+                }
+                return;
+            case 2:
                 return;
             default:
                 System.out.println(Constant.INVALID_CHOICE);

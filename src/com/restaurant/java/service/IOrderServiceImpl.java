@@ -1,17 +1,20 @@
 package com.restaurant.java.service;
 
 import com.restaurant.java.dao.OrderDao;
+import com.restaurant.java.dao.TableDao;
 import com.restaurant.java.entity.Menu_Item;
 import com.restaurant.java.entity.Order;
 import com.restaurant.java.entity.Order_Item;
 import com.restaurant.java.entity.Table;
 import com.restaurant.java.entity.enums.OrderEnum;
 import com.restaurant.java.entity.enums.OrderItemEnum;
+import com.restaurant.java.entity.enums.TableEnum;
 import com.restaurant.java.utils.Constant;
 import com.restaurant.java.utils.DatabaseConnection;
 
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.time.LocalDateTime;
 import java.util.List;
 
 public class IOrderServiceImpl implements IOrderService {
@@ -192,5 +195,41 @@ public class IOrderServiceImpl implements IOrderService {
         };
     }
 
-//    public List<Order_Item>
+    public boolean payOrder(Order order, LocalDateTime checkoutAt) {
+        if(order == null) {
+            System.out.println(Constant.VARIABLE_ERR_MGS);
+            return false;
+        }
+        Connection conn = null;
+        try {
+            conn = DatabaseConnection.openConnection();
+
+            conn.setAutoCommit(false);
+
+            if(orderDao.updateOrderStatus(conn,order.getId(), OrderEnum.paid)) {
+                if(TableDao.getInstance().updateTableStatus(conn,order.getTable().getId(), TableEnum.available)){
+                    if(orderDao.updateCheckoutAt(conn,order, checkoutAt)) {
+                        conn.commit();
+                        return true;
+                    }
+                }
+            }
+            conn.rollback();
+            return false;
+
+        } catch (Exception e) {
+            try {
+                if (conn != null) conn.rollback();
+            } catch (SQLException ex) {
+                return false;
+            }
+            return false;
+        } finally {
+            try {
+                if (conn != null) conn.close();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+    }
 }

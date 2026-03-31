@@ -5,11 +5,14 @@ import com.restaurant.java.entity.enums.OrderEnum;
 import com.restaurant.java.entity.enums.OrderItemEnum;
 import com.restaurant.java.entity.enums.TableEnum;
 import com.restaurant.java.entity.enums.UserRoleEnum;
+import com.restaurant.java.utils.Constant;
 import com.restaurant.java.utils.DatabaseConnection;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.Timestamp;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -46,7 +49,7 @@ public class OrderDao {
                 SELECT t.id,t.number,t.capacity,t.status
                 FROM Orders o
                 JOIN Tables t ON o.table_id = t.id
-                WHERE o.customer_id = ?;
+                WHERE o.customer_id = ? AND o.status = 'pending'; 
                 """;
         try (
                 Connection conn = DatabaseConnection.openConnection();
@@ -162,14 +165,15 @@ public class OrderDao {
                 FROM Orders o
                 JOIN Order_Items oi ON oi.order_id = o.id
                 JOIN Menu_Items m ON m.id = oi.menu_item
-                WHERE o.customer_id = ? AND o.table_id = ? AND o.status != 'cancel' AND oi.status != 'cancel'""";
+                WHERE o.id = ? AND o.customer_id = ? AND o.table_id = ? AND o.status != 'cancel' AND oi.status != 'cancel'""";
 
         try (
                 Connection conn = DatabaseConnection.openConnection();
                 PreparedStatement pstmt = conn.prepareStatement(sql);
         ) {
-            pstmt.setInt(1, user_id);
-            pstmt.setInt(2, table_id);
+            pstmt.setInt(1, item.getId());
+            pstmt.setInt(2, user_id);
+            pstmt.setInt(3, table_id);
             ResultSet rs = pstmt.executeQuery();
             List<Order_Item> order_items = new ArrayList<>();
             while (rs.next()) {
@@ -395,9 +399,43 @@ public class OrderDao {
             pstmt.setString(1, status.name());
             pstmt.setInt(2, order_item_id);
 
-            return  pstmt.executeUpdate() > 0;
+            return pstmt.executeUpdate() > 0;
         } catch (Exception e) {
             System.out.println("Lỗi cập nhật trạng thái đơn!");
+            return false;
+        }
+    }
+
+    public boolean updateOrderStatus(Connection conn, int order_id, OrderEnum status) {
+        String sql = """
+                UPDATE Orders
+                SET status = ?
+                WHERE id = ? """;
+        try (
+                PreparedStatement pstmt = conn.prepareStatement(sql);
+        ) {
+            pstmt.setString(1, status.name());
+            pstmt.setInt(2, order_id);
+            return pstmt.executeUpdate() > 0;
+        } catch (Exception e) {
+            System.out.println(Constant.RED_CODE + "Lỗi khi cập nhật trạng thái Order" + Constant.RESET_CODE);
+            return false;
+        }
+    }
+
+    public boolean updateCheckoutAt(Connection conn,Order order, LocalDateTime checkoutAt) {
+        String sql = """
+                UPDATE Orders
+                SET checkout_at = ?
+                WHERE id = ? """;
+        try (
+                PreparedStatement pstmt = conn.prepareStatement(sql);
+        ) {
+            pstmt.setTimestamp(1, Timestamp.valueOf(checkoutAt));
+            pstmt.setInt(2, order.getId());
+            return pstmt.executeUpdate() > 0;
+        } catch (Exception e) {
+            System.out.println("Lỗi khi cập nhật giờ checkout!");
             return false;
         }
     }

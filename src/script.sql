@@ -3,55 +3,63 @@ CREATE DATABASE IF NOT EXISTS Project;
 USE Project;
 
 CREATE TABLE Users( -- user
-id int primary key auto_increment,
-username varchar(255) not null unique ,
-password varchar(255) not null ,
-role ENUM('customer','chef','manager'),
-status BOOLEAN default true
+                      id int primary key auto_increment,
+                      username varchar(255) not null unique ,
+                      password varchar(255) not null ,
+                      role ENUM('customer','chef','manager'),
+                      status BOOLEAN default true
 );
 
 CREATE TABLE Tables( -- bàn
-id int primary key auto_increment,
-number varchar(255) not null unique ,
-capacity int not null ,
-status ENUM('available','occupied','reserved','block') default 'available'
+                       id int primary key auto_increment,
+                       number varchar(255) not null unique ,
+                       capacity int not null ,
+                       status ENUM('available','occupied','reserved','block') default 'available'
 );
 
 CREATE TABLE Categories( -- danh mục
-   id int primary key auto_increment,
-   name VARCHAR(255) not null,
-   status boolean default true
+                           id int primary key auto_increment,
+                           name VARCHAR(255) not null,
+                           status boolean default true
 );
 
 create table Menu_Items( -- món trong thực đơn
-   id int primary key auto_increment,
-   categories_id int,
-   foreign key (categories_id) references Categories(id),
-   name varchar(255) not null ,
-   price decimal(15,2) not null check ( price > 0 ),
-   status BOOLEAN default true
+                           id int primary key auto_increment,
+                           categories_id int,
+                           foreign key (categories_id) references Categories(id),
+                           name varchar(255) not null ,
+                           price decimal(15,2) not null check ( price > 0 ),
+                           status BOOLEAN default true
 );
 
 
 create table Orders( -- phiếu đặt hàng
-id int primary key auto_increment,
-customer_id int,
-table_id int,
-foreign key (customer_id) references Users(id),
-foreign key (table_id) references Tables(id),
-total_amount decimal(15,2) not null check ( total_amount >= 0 ) default 0,
-status enum('pending','paid','cancel') default 'pending',
-created_at datetime default current_timestamp
+                       id int primary key auto_increment,
+                       customer_id int,
+                       table_id int,
+                       foreign key (customer_id) references Users(id),
+                       foreign key (table_id) references Tables(id),
+                       total_amount decimal(15,2) not null check ( total_amount >= 0 ) default 0,
+                       status enum('pending','paid','cancel') default 'pending',
+                       created_at datetime default current_timestamp
 );
 
 create table Order_Items( -- chi tiết sản phẩm trong phiếu đặt hàng
-    id int primary key auto_increment,
-    order_id int,
-    menu_item int,
-    unit_price decimal(15,2) not null check ( unit_price > 0 ),
-    quantity int not null check ( quantity > 0 ),
-    status enum('waiting','pending','cooking','ready','served','cancel') default 'waiting',
-    note varchar(255),
-    foreign key(order_id) references Orders(id),
-    foreign key(menu_item) references Menu_Items(id)
+                            id int primary key auto_increment,
+                            order_id int,
+                            menu_item int,
+                            unit_price decimal(15,2) not null check ( unit_price > 0 ),
+                            quantity int not null check ( quantity > 0 ),
+                            status enum('waiting','pending','cooking','ready','served','cancel') default 'waiting',
+                            note varchar(255),
+                            foreign key(order_id) references Orders(id),
+                            foreign key(menu_item) references Menu_Items(id)
+);
+
+create table Reviews(
+                        id int primary key auto_increment,
+                        content varchar(255),
+                        user_id int,
+                        foreign key(user_id) references Users(id),
+                        star int not null check(star >= 0 AND star <= 5)
 );

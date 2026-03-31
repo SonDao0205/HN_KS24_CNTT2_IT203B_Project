@@ -155,10 +155,9 @@ public class TableDao {
         }
     }
 
-    public boolean updateTableStatus(int id, TableEnum tableEnum) {
+    public boolean updateTableStatus(Connection conn, int id, TableEnum tableEnum) {
         String sql = "UPDATE Tables SET status = ? WHERE id = ?";
         try (
-                Connection conn = DatabaseConnection.openConnection();
                 PreparedStatement pstmt = conn.prepareStatement(sql);
         ) {
             pstmt.setString(1, tableEnum.toString());

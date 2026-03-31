@@ -4,7 +4,10 @@ import com.restaurant.java.dao.TableDao;
 import com.restaurant.java.entity.Table;
 import com.restaurant.java.entity.enums.TableEnum;
 import com.restaurant.java.utils.Constant;
+import com.restaurant.java.utils.DatabaseConnection;
 
+import java.sql.Connection;
+import java.sql.SQLException;
 import java.util.List;
 
 public class ITableServiceImpl implements ITableService {
@@ -105,6 +108,23 @@ public class ITableServiceImpl implements ITableService {
             System.out.println(Constant.VARIABLE_ERR_MGS);
             return false;
         }
-        return tableDao.updateTableStatus(id, TableEnum.occupied);
+        Connection conn = null;
+        try {
+            conn = DatabaseConnection.openConnection();
+            return tableDao.updateTableStatus(conn,id, TableEnum.occupied);
+        }catch (Exception e) {
+            try {
+                if (conn != null) conn.rollback();
+            } catch (SQLException ex) {
+                System.out.println("Lỗi SQL!");
+            }
+            return false;
+        } finally {
+            try {
+                if (conn != null) conn.close();
+            } catch (SQLException e) {
+                System.out.println("Lỗi SQL!");
+            }
+        }
     }
 }
