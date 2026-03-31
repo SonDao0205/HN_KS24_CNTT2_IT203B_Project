@@ -11,4 +11,5 @@ public interface IMenuService {
     public boolean delete(int id);
     public Menu_Item getById(int id);
     public List<Menu_Item> getList();
+    public List<Menu_Item> findByName(String name);
 }

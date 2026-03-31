@@ -27,7 +27,7 @@ public class UserDao {
     }
 
     public User findById(int id) {
-        String sql = "select * from user where id=?";
+        String sql = "select * from Users where id=?";
         try (
                 Connection conn = DatabaseConnection.openConnection();
                 PreparedStatement ps = conn.prepareStatement(sql);
@@ -176,6 +176,23 @@ public class UserDao {
         } catch (Exception e) {
             System.out.println("Lỗi lấy danh sách tài khoản!");
             return null;
+        }
+    }
+
+    public boolean blockUser(User user) {
+        String sql = """
+                UPDATE Users
+                SET status = 0
+                WHERE id = ? """;
+        try (
+                Connection conn = DatabaseConnection.openConnection();
+                PreparedStatement pstmt = conn.prepareStatement(sql);
+        ) {
+            pstmt.setInt(1, user.getId());
+            return pstmt.executeUpdate() > 0;
+        } catch (Exception e) {
+            System.out.println("Lỗi khi khoá tài khoản!");
+            return false;
         }
     }
 }

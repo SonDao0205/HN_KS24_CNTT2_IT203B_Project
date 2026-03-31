@@ -2,6 +2,7 @@ package com.restaurant.java.service;
 
 import com.restaurant.java.dao.UserDao;
 import com.restaurant.java.entity.User;
+import com.restaurant.java.utils.Constant;
 import com.restaurant.java.utils.UserSession;
 
 import java.util.List;
@@ -28,6 +29,10 @@ public class IUserServiceImpl implements IAuthService, IUserService {
         }
         try{
             User currentUser = userDao.login(username, password);
+            if(!currentUser.isStatus()){
+                System.out.println(Constant.YELLOW_CODE + "Tài khoản này đã bị khoá!" + Constant.RESET_CODE);
+                return null;
+            }
             if (currentUser != null) {
                 userSession.login(currentUser);
                 return currentUser;
@@ -54,11 +59,11 @@ public class IUserServiceImpl implements IAuthService, IUserService {
     @Override
     public boolean insert(User user) {
         if(user == null){
-            System.out.println("Dữ liệu không hợp lệ!");
+            System.out.println(Constant.VARIABLE_ERR_MGS);
             return false;
         }
         if(getByUsername(user.getUsername()) != null){
-            System.out.println("Tên tài khoản đã tồn tại!");
+            System.out.println(Constant.YELLOW_CODE + "Tên tài khoản đã tồn tại!" + Constant.RESET_CODE);
             return false;
         }
         return userDao.insert(user);
@@ -67,7 +72,7 @@ public class IUserServiceImpl implements IAuthService, IUserService {
     @Override
     public boolean update(User user) {
         if(user == null){
-            System.out.println("Dữ liệu không hợp lệ!");
+            System.out.println(Constant.VARIABLE_ERR_MGS);
             return false;
         }
         return userDao.update(user);
@@ -76,11 +81,12 @@ public class IUserServiceImpl implements IAuthService, IUserService {
     @Override
     public boolean delete(int id) {
         if(id <= 0){
-            System.out.println("Dữ liệu không hợp lệ!");
+            System.out.println(Constant.VARIABLE_ERR_MGS);
             return false;
         }
         if(getById(id) == null){
-            System.out.println("Id không hợp lệ!");
+            System.out.println(Constant.YELLOW_CODE + "Id người dùng không hợp lệ!" + Constant.RESET_CODE);
+
             return false;
         }
         return userDao.delete(id);
@@ -89,7 +95,7 @@ public class IUserServiceImpl implements IAuthService, IUserService {
     @Override
     public User getById(int id) {
         if(id <= 0){
-            System.out.println("Dữ liệu không hợp lệ!");
+            System.out.println(Constant.VARIABLE_ERR_MGS);
             return null;
         }
         return userDao.findById(id);
@@ -98,7 +104,7 @@ public class IUserServiceImpl implements IAuthService, IUserService {
     @Override
     public User getByUsername(String username) {
         if(username == null || username.isEmpty()){
-            System.out.println("Dữ liệu không hợp lệ!");
+            System.out.println(Constant.VARIABLE_ERR_MGS);
             return null;
         }
         return userDao.findByUsername(username);
@@ -108,17 +114,22 @@ public class IUserServiceImpl implements IAuthService, IUserService {
     public List<User> getAll() {
         List<User> userList = userDao.getList();
         if(userList == null || userList.isEmpty()){
-            System.out.println("Danh sách tài khoản rỗng!");
+            System.out.println(Constant.YELLOW_CODE + "Danh sách tài khoản rỗng!" + Constant.RESET_CODE);
             return null;
         }
         return userList;
     }
 
-    public boolean bookTable(int user_id, int table_id){
-        if(user_id <= 0 || table_id <= 0){
-            System.out.println("Dữ liệu không hợp lệ!");
+    @Override
+    public boolean blockUser(User user) {
+        if(user == null){
+            System.out.println(Constant.VARIABLE_ERR_MGS);
             return false;
         }
-        return false;
+        if(!user.isStatus()){
+            System.out.println(Constant.YELLOW_CODE + "Tài khoản này đã bị khoá!" + Constant.RESET_CODE);
+            return false;
+        }
+        return userDao.blockUser(user);
     }
 }

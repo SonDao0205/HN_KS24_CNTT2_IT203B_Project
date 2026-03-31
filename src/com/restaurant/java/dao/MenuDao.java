@@ -146,4 +146,41 @@ public class MenuDao {
             return null;
         }
     }
+
+    public List<Menu_Item> findByName(String name) {
+        String searchPattern = "%" + name + "%";
+        String sql = """
+                SELECT m.id, m.name, m.price, m.status, c.id as categories_id, c.name as categories_name, c.status as categories_status
+                FROM Project.Menu_Items m
+                JOIN Categories c ON m.categories_id = c.id
+                WHERE m.name LIKE ? AND m.status = 1 AND c.status = 1""";
+
+        try (
+                Connection conn = DatabaseConnection.openConnection();
+                PreparedStatement pstmt = conn.prepareStatement(sql);
+        ) {
+            pstmt.setString(1, searchPattern);
+            ResultSet rs = pstmt.executeQuery();
+            List<Menu_Item> list = new ArrayList<>();
+            while (rs.next()) {
+                Categories categories = new Categories(
+                        rs.getInt("categories_id"),
+                        rs.getString("categories_name"),
+                        rs.getBoolean("categories_status")
+                );
+
+                list.add(new Menu_Item(
+                        rs.getInt("id"),
+                        categories,
+                        rs.getString("name"),
+                        rs.getDouble("price"),
+                        rs.getBoolean("status")
+                ));
+            }
+            return list;
+        } catch (Exception e) {
+            System.out.println("Lỗi khi lấy sản phẩm bằng tên!");
+            return null;
+        }
+    }
 }

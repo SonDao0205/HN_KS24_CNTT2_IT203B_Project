@@ -1,8 +1,12 @@
 package com.restaurant.java.presentation;
 
+import com.restaurant.java.entity.Order_Item;
+import com.restaurant.java.entity.enums.OrderItemEnum;
+import com.restaurant.java.service.IOrderServiceImpl;
 import com.restaurant.java.utils.InputMethod;
 import com.restaurant.java.utils.UserSession;
 
+import java.util.List;
 import java.util.Scanner;
 
 public class ChefMenu {
@@ -19,6 +23,12 @@ public class ChefMenu {
                     +---------------------------------------+""");
             choice = InputMethod.getInt(sc, "Lựa chọn của bạn : ");
             switch (choice) {
+                case 1:
+                    listOrderItem();
+                    break;
+                case 2:
+                    updateOrderItemStatus(sc);
+                    break;
                 case 0:
                     System.out.println("Bạn có chắc chắn muốn đăng xuất : ");
                     System.out.println("1. Xác nhận");
@@ -35,5 +45,70 @@ public class ChefMenu {
                     break;
             }
         } while (choice != 0);
+    }
+
+    public static void listOrderItem() {
+        List<Order_Item> orderItemList = IOrderServiceImpl.getInstance().getOrderItemWithStatus(OrderItemEnum.pending);
+        if (orderItemList == null) {
+            return;
+        }
+        System.out.println("Danh sách các món đang chờ : ");
+        for (Order_Item orderItem : orderItemList) {
+            System.out.printf("|Id : %d | Name : %s | Quantity : %d | Status : %s |\n",
+                    orderItem.getId(), orderItem.getMenu_item().getName(), orderItem.getQuantity(), orderItem.getStatus());
+        }
+    }
+
+    public static void updateOrderItemStatus(Scanner sc) {
+        List<Order_Item> orderItemList = IOrderServiceImpl.getInstance().getOrderItemExcludeStatus();
+        if (orderItemList == null) {
+            return;
+        }
+        System.out.println("Danh sách các đơn hiện tại : ");
+        for (Order_Item orderItem : orderItemList) {
+            System.out.printf("|Id : %d | Name : %s | Quantity : %d | Status : %s |\n",
+                    orderItem.getId(), orderItem.getMenu_item().getName(), orderItem.getQuantity(), orderItem.getStatus());
+        }
+        System.out.println("0. Quay lại");
+        int id = InputMethod.getInt(sc, "Nhập id của đơn muốn cập nhật : ");
+        if(id == 0){
+            return;
+        }
+        OrderItemEnum status = IOrderServiceImpl.getInstance().getOrderItemStatus(id);
+        if (status == null) {
+            System.out.println("Không tìm thấy đơn với id này!");
+            return;
+        }
+        if(status == OrderItemEnum.cancel) {
+            System.out.println("Đơn này đã bị huỷ! Không thể cập nhật!");
+            return;
+        }
+        OrderItemEnum nextStatus = switch (status) {
+            case pending -> OrderItemEnum.cooking;
+            case cooking -> OrderItemEnum.ready;
+            case ready -> OrderItemEnum.served;
+            default -> null;
+        };
+
+        System.out.printf("Trạng thái đơn hiện tại là (%s) bạn có muốn đổi sang trạng thái (%s) không : \n",status,nextStatus);
+        System.out.println("1. Chắc chắn");
+        System.out.println("2. Huỷ");
+        int choice = InputMethod.getInt(sc, "Lựa chọn của bạn : ");
+        switch (choice) {
+            case 1:
+                if (IOrderServiceImpl.getInstance().updateOrderItemStatus(id, status)) {
+                    System.out.println("Cập nhật thành công!");
+                } else {
+                    System.out.println("Cập nhật thất bại!");
+                }
+                return;
+            case 2:
+                return;
+            default:
+                System.out.println("Lựa chọn không phù hợp!");
+                return;
+        }
+
+
     }
 }

@@ -69,7 +69,7 @@ public class TableDao {
     }
 
     public Table getById(int id) {
-        String sql = "SELECT * FROM Tables WHERE id = ?";
+        String sql = "SELECT * FROM Tables WHERE id = ? AND status = 'available'";
         try (
                 Connection conn = DatabaseConnection.openConnection();
                 PreparedStatement pstmt = conn.prepareStatement(sql);
@@ -168,4 +168,8 @@ public class TableDao {
             return false;
         }
     }
+
+//    public List<Table> getTableByUserId(int user_id){
+//
+//    }
 }

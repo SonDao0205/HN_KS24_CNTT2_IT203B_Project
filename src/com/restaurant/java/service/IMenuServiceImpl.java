@@ -56,4 +56,18 @@ public class IMenuServiceImpl implements IMenuService {
     public List<Menu_Item> getList() {
         return menuDao.getList();
     }
+
+    @Override
+    public List<Menu_Item> findByName(String name) {
+        if(name == null || name.isEmpty()){
+            System.out.println("Dữ liệu không hợp lệ!");
+            return null;
+        }
+
+        List<Menu_Item> list = menuDao.findByName(name);
+        if(list == null){
+            System.out.println("Không tìm kiếm thấy sản phẩm với tên này!");
+        }
+        return list;
+    }
 }

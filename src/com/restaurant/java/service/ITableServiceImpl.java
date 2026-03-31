@@ -3,6 +3,7 @@ package com.restaurant.java.service;
 import com.restaurant.java.dao.TableDao;
 import com.restaurant.java.entity.Table;
 import com.restaurant.java.entity.enums.TableEnum;
+import com.restaurant.java.utils.Constant;
 
 import java.util.List;
 
@@ -21,11 +22,11 @@ public class ITableServiceImpl implements ITableService {
     @Override
     public boolean insert(Table table) {
         if (table == null) {
-            System.out.println("Dữ liệu không hợp lệ!");
+            System.out.println(Constant.VARIABLE_ERR_MGS);
             return false;
         }
         if(isNumberExist(table.getNumber())) {
-            System.out.println("Số định danh bàn đã tồn tại!");
+            System.out.println(Constant.YELLOW_CODE + "Số định danh bàn đã tồn tại!" + Constant.RESET_CODE);
             return false;
         }
         return tableDao.insert(table);
@@ -34,11 +35,11 @@ public class ITableServiceImpl implements ITableService {
     @Override
     public boolean update(Table table) {
         if(table == null || table.getId() <= 0){
-            System.out.println("Dữ liệu không hợp lệ!");
+            System.out.println(Constant.VARIABLE_ERR_MGS);
             return false;
         }
         if(isNumberExist(table.getNumber())) {
-            System.out.println("Số định danh bàn đã tồn tại!");
+            System.out.println(Constant.YELLOW_CODE + "Số định danh bàn đã tồn tại!" + Constant.RESET_CODE);
             return false;
         }
         return tableDao.update(table);
@@ -47,11 +48,11 @@ public class ITableServiceImpl implements ITableService {
     @Override
     public boolean delete(int id) {
         if(id <= 0){
-            System.out.println("Id không hợp lệ!");
+            System.out.println(Constant.YELLOW_CODE + "Id không hợp lệ!" + Constant.RESET_CODE);
             return false;
         }
         if(getById(id) == null){
-            System.out.println("Không tìm thấy bàn hợp lệ!");
+            System.out.println(Constant.YELLOW_CODE + "Không tìm thấy bàn hợp lệ!" + Constant.RESET_CODE);
             return false;
         }
         return tableDao.delete(id);
@@ -60,7 +61,7 @@ public class ITableServiceImpl implements ITableService {
     @Override
     public Table getById(int id) {
         if(id <= 0){
-            System.out.println("Id không hợp lệ!");
+            System.out.println(Constant.YELLOW_CODE + "Id không hợp lệ!" + Constant.RESET_CODE);
             return null;
         }
         return tableDao.getById(id);
@@ -70,7 +71,7 @@ public class ITableServiceImpl implements ITableService {
     public List<Table> getAll() {
         List<Table> tableList = tableDao.getList();
         if(tableList == null || tableList.isEmpty()){
-            System.out.println("Danh sách bàn trống!");
+            System.out.println(Constant.YELLOW_CODE + "Danh sách bàn trống!" + Constant.RESET_CODE);
             return null;
         }
         return tableList;
@@ -84,7 +85,7 @@ public class ITableServiceImpl implements ITableService {
     public List<Table> getTableAvailable() {
         List<Table> tableList = tableDao.getListTableAvailable();
         if(tableList == null || tableList.isEmpty()){
-            System.out.println("Danh sách bàn trống!");
+            System.out.println(Constant.YELLOW_CODE + "Danh sách bàn trống!" + Constant.RESET_CODE);
             return null;
         }
         return tableList;
@@ -92,7 +93,7 @@ public class ITableServiceImpl implements ITableService {
 
     public boolean bookedTable(int id) {
         if(id <= 0){
-            System.out.println("Dữ liệu không hợp lệ!");
+            System.out.println(Constant.VARIABLE_ERR_MGS);
             return false;
         }
         return tableDao.updateTableStatus(id, TableEnum.occupied);

@@ -1,6 +1,7 @@
 package com.restaurant.java.presentation;
 
 import com.restaurant.java.entity.Table;
+import com.restaurant.java.service.IMenuServiceImpl;
 import com.restaurant.java.service.ITableServiceImpl;
 import com.restaurant.java.utils.InputMethod;
 
@@ -131,7 +132,20 @@ public class TableManagement {
 
     public static boolean deleteTable(Scanner sc) {
         int id = InputMethod.getInt(sc,"Nhập id bàn muốn xoá : ");
-        return ITableServiceImpl.getInstance().delete(id);
+        System.out.println("Bạn có chắc chắn muốn xoá : ");
+        System.out.println("1. Chắc chắn");
+        System.out.println("2. Huỷ");
+        int subChoice = InputMethod.getInt(sc, "Lựa chọn của bạn : ");
+        switch (subChoice) {
+            case 1:
+                return ITableServiceImpl.getInstance().delete(id);
+            case 2:
+                break;
+            default:
+                System.out.println("Lựa chọn không phù hợp!");
+                break;
+        }
+        return false;
     }
 
     public static void getListTable() {

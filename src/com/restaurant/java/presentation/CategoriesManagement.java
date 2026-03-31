@@ -31,9 +31,14 @@ public class CategoriesManagement {
                     }
                     break;
                 case 2:
+                    if(updateCategory(sc)){
+                        System.out.println("Cập nhật thành công!");
+                    }else{
+                        System.out.println("Cập nhật thất bại!");
+                    }
                     break;
                 case 3:
-                    if(dedeleCategory(sc)){
+                    if(deleteCategory(sc)){
                         System.out.println("Xoá danh mục thành công!");
                     }else{
                         System.out.println("Xoá danh mục thất bại!");
@@ -56,7 +61,7 @@ public class CategoriesManagement {
         return ICategoriesServiceImpl.getInstance().insert(new Categories(name));
     }
 
-    public static boolean dedeleCategory(Scanner sc){
+    public static boolean deleteCategory(Scanner sc){
         int id = InputMethod.getInt(sc,"Nhập id muốn xoá : ");
         return ICategoriesServiceImpl.getInstance().delete(id);
     }
@@ -71,6 +76,20 @@ public class CategoriesManagement {
         for (Categories categories : categoriesList) {
             System.out.printf("|Id : %d | Name : %s | Status : %s |\n ",categories.getId(),categories.getName(),(categories.isStatus() ? "Đang hoạt động" : "Ngừng hoạt động"));
         }
+    }
+
+    public static boolean updateCategory(Scanner sc){
+        int id = InputMethod.getInt(sc,"Nhập id danh mục muốn sửa : ");
+        Categories categories = ICategoriesServiceImpl.getInstance().getById(id);
+        if(categories == null){
+            System.out.println("Không tìm thấy danh mục phù hợp!");
+            return false;
+        }
+        System.out.println("Cập nhật dữ liệu : ");
+        String name = InputMethod.getString(sc,"Nhập tên mới : ");
+        return ICategoriesServiceImpl.getInstance().update(id,name);
+
+
 
     }
 }

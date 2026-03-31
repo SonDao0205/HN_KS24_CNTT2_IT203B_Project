@@ -12,4 +12,5 @@ public interface IUserService {
     public User getById(int id);
     public User getByUsername(String username);
     public List<User> getAll();
+    public boolean blockUser(User user);
 }

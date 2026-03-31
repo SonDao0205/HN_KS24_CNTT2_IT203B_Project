@@ -20,10 +20,19 @@ public class Menu_Item {
         this.status = status;
     }
 
+    public Menu_Item(int id, String name, double price, boolean status) {
+        this.id = id;
+        this.categories = null;
+        this.name = name;
+        this.price = price;
+        this.status = status;
+    }
+
     public Menu_Item(String name, double price) {
         this.name = name;
         this.price = price;
     }
+
 
     public Menu_Item() {
         this.status = true;

@@ -22,8 +22,9 @@ public class InputMethod {
                 int input = Integer.parseInt(sc.nextLine().trim());
                 if(input < 0){
                     System.out.println(Constant.INPUT_ERR_MGS);
+                }else{
+                    return input;
                 }
-                return input;
             }catch(NumberFormatException e){
                 System.out.println(Constant.INPUT_ERR_MGS);
             }
@@ -37,8 +38,9 @@ public class InputMethod {
                 double input = Double.parseDouble(sc.nextLine().trim());
                 if(input < 0){
                     System.out.println(Constant.INPUT_ERR_MGS);
+                }else{
+                    return input;
                 }
-                return input;
             }catch(NumberFormatException e){
                 System.out.println(Constant.INPUT_ERR_MGS);
             }

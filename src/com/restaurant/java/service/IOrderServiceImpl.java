@@ -1,9 +1,17 @@
 package com.restaurant.java.service;
 
 import com.restaurant.java.dao.OrderDao;
+import com.restaurant.java.entity.Menu_Item;
 import com.restaurant.java.entity.Order;
+import com.restaurant.java.entity.Order_Item;
+import com.restaurant.java.entity.Table;
 import com.restaurant.java.entity.enums.OrderEnum;
+import com.restaurant.java.entity.enums.OrderItemEnum;
+import com.restaurant.java.utils.Constant;
+import com.restaurant.java.utils.DatabaseConnection;
 
+import java.sql.Connection;
+import java.sql.SQLException;
 import java.util.List;
 
 public class IOrderServiceImpl implements IOrderService {
@@ -31,32 +39,148 @@ public class IOrderServiceImpl implements IOrderService {
     }
 
     @Override
-    public boolean updateOrder(int order_id, OrderEnum orderStatus) {
-        return false;
+    public List<Order_Item> getOrderItems(int user_id, int table_id, Order order) {
+        if(user_id <= 0 || table_id <= 0 || order == null) {
+            System.out.println("Dữ liệu không hợp lệ!");
+            return null;
+        }
+        return  orderDao.getOrderItems(user_id, table_id, order);
     }
 
     @Override
-    public boolean deleteOrder(int order_id) {
-        return false;
+    public boolean cancelOrderItem(int order_item_id) {
+        if (order_item_id <= 0) {
+            System.out.println("Dữ liệu không hợp lệ!");
+            return false;
+        }
+        OrderItemEnum status = orderDao.getOrderItemStatus(order_item_id);
+        if(status == null) {
+            System.out.println("Không tìm thấy món!");
+            return false;
+        }
+        if(status.equals(OrderItemEnum.pending)) {
+            return orderDao.cancelOrderItem(order_item_id);
+        } else if (status.equals(OrderItemEnum.cancel)) {
+            System.out.println("Món đã bị huỷ!");
+            return false;
+        } else{
+            System.out.println("Món đang được xử lý, không thể huỷ!");
+            return false;
+        }
     }
 
     @Override
-    public boolean updateAmountOrder(int order_id, double price) {
-        return false;
+    public Order getOrder(int user_id, int table_id) {
+        if(user_id <= 0 || table_id <= 0) {
+            System.out.println("Dữ liệu không hợp lệ!");
+            return null;
+        }
+        return orderDao.getOrder(user_id, table_id);
     }
 
     @Override
-    public Order getOrder(int order_id) {
-        return null;
+    public List<Table> getListTableByUser(int user_id){
+        if(user_id <= 0){
+            System.out.println("Dữ liệu không hợp lệ!");
+            return null;
+        }
+        List<Table> tableList = orderDao.getTableByUserId(user_id);
+        if(tableList == null || tableList.isEmpty()){
+            System.out.println("Danh sách bàn rỗng!");
+            return null;
+        }
+        return  tableList;
     }
 
     @Override
-    public List<Order> getListByTable(int table_id) {
-        return List.of();
+    public boolean addItemOrder(int order_id, Menu_Item item, int quantity, String note) {
+        if (order_id <= 0 || quantity <= 0 || item == null) {
+            System.out.println("Dữ liệu không hợp lệ!");
+            return false;
+        }
+
+        Connection conn = null;
+        try {
+            conn = DatabaseConnection.openConnection();
+
+            conn.setAutoCommit(false);
+            double totalItemPrice = item.getPrice() * quantity;
+            boolean isAmountUpdated = orderDao.updateOrderAmount(conn, order_id, totalItemPrice);
+
+            if (isAmountUpdated) {
+                boolean isItemAdded = orderDao.createOrderItems(conn, order_id, item, quantity, note);
+
+                if (isItemAdded) {
+                    conn.commit();
+                    return true;
+                }
+            }
+            conn.rollback();
+            return false;
+
+        } catch (Exception e) {
+            try {
+                if (conn != null) conn.rollback();
+            } catch (SQLException ex) {
+                ex.printStackTrace();
+            }
+            e.printStackTrace();
+            return false;
+        } finally {
+            try {
+                if (conn != null) conn.close();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
+
     @Override
-    public List<Order> getAllList() {
-        return List.of();
+    public List<Order_Item> getOrderItemWithStatus(OrderItemEnum orderItemEnum) {
+        if(orderItemEnum == null) {
+            System.out.println(Constant.VARIABLE_ERR_MGS);
+            return null;
+        }
+        List<Order_Item> orderItemList = orderDao.getOrderItemWithStatus(orderItemEnum);
+        if(orderItemList == null || orderItemList.isEmpty()){
+            System.out.println("Danh sách dữ liệu trống!");
+            return null;
+        }
+        return orderItemList;
+    }
+
+    public List<Order_Item> getOrderItemExcludeStatus() {
+        List<Order_Item> orderItemList = orderDao.getOrderItemExcludesStatus();
+        if(orderItemList == null || orderItemList.isEmpty()){
+            System.out.println("Danh sách dữ liệu trống!");
+            return null;
+        }
+        return orderItemList;
+    }
+
+    public OrderItemEnum getOrderItemStatus(int order_item_id) {
+        if(order_item_id <= 0) {
+            System.out.println(Constant.VARIABLE_ERR_MGS);
+            return null;
+        }
+        return orderDao.getOrderItemStatus(order_item_id);
+    }
+
+    public boolean updateOrderItemStatus(int order_item_id,OrderItemEnum orderItemEnum) {
+        if(order_item_id <= 0) {
+            System.out.println(Constant.VARIABLE_ERR_MGS);
+            return false;
+        }
+        if(orderItemEnum.equals(OrderItemEnum.cancel)) {
+            System.out.println("Đơn này đã bị huỷ!");
+            return false;
+        }
+        return switch (orderItemEnum) {
+            case OrderItemEnum.pending -> orderDao.updateOrderItemStatus(order_item_id, OrderItemEnum.cooking);
+            case OrderItemEnum.cooking -> orderDao.updateOrderItemStatus(order_item_id, OrderItemEnum.ready);
+            case OrderItemEnum.ready -> orderDao.updateOrderItemStatus(order_item_id, OrderItemEnum.served);
+            default -> false;
+        };
     }
 }
