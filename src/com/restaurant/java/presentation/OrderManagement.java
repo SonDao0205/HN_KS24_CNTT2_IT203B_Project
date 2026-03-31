@@ -45,22 +45,22 @@ public class OrderManagement {
             System.out.println("+--------------------------------------------------------------------------+");
         }
         System.out.println("0. Quay lại");
-        boolean flag = false;
         int order_item_id = InputMethod.getInt(sc,"Nhập id của đơn muốn duyệt : ");
         if(order_item_id == 0){
             return;
         }
+        Order_Item item = null;
         for (Order_Item orderItem : orderItemList) {
             if(orderItem.getId() == order_item_id){
-                flag = true;
+                item = orderItem;
                 break;
             }
         }
-        if(!flag){
+        if(item == null){
             System.out.println(Constant.INVALID_ID_FOUND);
             return;
         }
-        if(IOrderServiceImpl.getInstance().updateOrderItemStatus(order_item_id, OrderItemEnum.pending)){
+        if(IOrderServiceImpl.getInstance().updateOrderItemStatus(item, OrderItemEnum.waiting)){
             System.out.println(Constant.GREEN_CODE + "Duyệt đơn thành công!" + Constant.RESET_CODE);
         }else{
             System.out.println(Constant.RED_CODE + "Duyệt đơn thất bại!" + Constant.RESET_CODE);

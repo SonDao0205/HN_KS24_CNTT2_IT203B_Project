@@ -119,9 +119,10 @@ public class OrderDao {
         }
     }
 
-    public boolean createOrderItems(Connection conn, int order_id, Menu_Item item, int quantity, String note) {
+    public boolean createOrderItems(int order_id, Menu_Item item, int quantity, String note) {
         String sql = "INSERT INTO Order_Items(order_id,menu_item,unit_price,quantity,note) VALUES ( ?, ?, ?, ?, ? )";
         try (
+                Connection conn = DatabaseConnection.openConnection();
                 PreparedStatement pstmt = conn.prepareStatement(sql);
         ) {
             pstmt.setInt(1, order_id);
@@ -346,7 +347,7 @@ public class OrderDao {
                 FROM Order_Items oi
                 JOIN Orders o ON oi.order_id = o.id
                 JOIN Menu_Items m ON oi.menu_item = m.id
-                WHERE oi.status <> ? AND oi.status <> ?
+                WHERE oi.status <> ? AND oi.status <> ? AND oi.status <> ?
                 """;
 
         try (
@@ -355,6 +356,7 @@ public class OrderDao {
         ) {
             pstmt.setString(1, OrderItemEnum.cancel.name());
             pstmt.setString(2, OrderItemEnum.waiting.name());
+            pstmt.setString(3, OrderItemEnum.served.name());
             ResultSet rs = pstmt.executeQuery();
 
             while (rs.next()) {
@@ -386,14 +388,13 @@ public class OrderDao {
         return list;
     }
 
-    public boolean updateOrderItemStatus(int order_item_id, OrderItemEnum status) {
+    public boolean updateOrderItemStatus(Connection conn, int order_item_id, OrderItemEnum status) {
         String sql = """
                 UPDATE Order_Items
                 SET status = ?
                 WHERE id = ? """;
 
         try (
-                Connection conn = DatabaseConnection.openConnection();
                 PreparedStatement pstmt = conn.prepareStatement(sql);
         ) {
             pstmt.setString(1, status.name());

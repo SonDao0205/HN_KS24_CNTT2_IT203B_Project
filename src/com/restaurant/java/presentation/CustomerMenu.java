@@ -1,6 +1,7 @@
 package com.restaurant.java.presentation;
 
 import com.restaurant.java.entity.*;
+import com.restaurant.java.entity.enums.OrderItemEnum;
 import com.restaurant.java.service.*;
 import com.restaurant.java.utils.Constant;
 import com.restaurant.java.utils.InputMethod;
@@ -336,7 +337,13 @@ public class CustomerMenu {
             return;
         }
         List<Order_Item> orderItemsList = IOrderServiceImpl.getInstance().getOrderItems(UserSession.getInstance().getCurrentUser().getId(), table_id, pickOrder);
-
+        List<Order_Item> filteredList = null;
+        if (orderItemsList != null) {
+            filteredList = orderItemsList.stream()
+                    .filter(item -> item.getStatus() != OrderItemEnum.waiting
+                            && item.getStatus() != OrderItemEnum.pending)
+                    .toList();
+        }
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm dd/MM/yy");
         System.out.println("-------Hoá Đơn-------");
         System.out.println("Tên khách hàng : " + pickOrder.getCustomer().getUsername());
@@ -344,7 +351,8 @@ public class CustomerMenu {
         System.out.println("Giờ vào bàn : "+ pickOrder.getCreated_at().format(formatter));
         LocalDateTime checkoutAt = LocalDateTime.now();
         System.out.println("Giờ rời : " + checkoutAt.format(formatter));
-        if (orderItemsList == null || orderItemsList.isEmpty()) {
+
+        if (filteredList == null || filteredList.isEmpty()) {
             System.out.println("Danh sách các món đã gọi trống! Bạn chưa gọi món!");
         } else {
             System.out.println("Danh sách các món đã gọi : ");
@@ -352,7 +360,7 @@ public class CustomerMenu {
             System.out.printf("|%-5s|%-30s|%-10s|%-13s|\n", "STT", "Name", "Quantity", "Đơn giá");
             System.out.println("+--------------------------------------------------------------+");
             int i = 1;
-            for (Order_Item orderItem : orderItemsList) {
+            for (Order_Item orderItem : filteredList) {
                 System.out.printf("|%-5d|%-30s|%-10d|%-13.2f|\n", i++, orderItem.getMenu_item().getName(), orderItem.getQuantity(), orderItem.getUnit_price());
                 System.out.println("+--------------------------------------------------------------+");
             }

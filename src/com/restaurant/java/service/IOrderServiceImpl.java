@@ -109,41 +109,7 @@ public class IOrderServiceImpl implements IOrderService {
             System.out.println("Dữ liệu không hợp lệ!");
             return false;
         }
-
-        Connection conn = null;
-        try {
-            conn = DatabaseConnection.openConnection();
-
-            conn.setAutoCommit(false);
-            double totalItemPrice = item.getPrice() * quantity;
-            boolean isAmountUpdated = orderDao.updateOrderAmount(conn, order_id, totalItemPrice);
-
-            if (isAmountUpdated) {
-                boolean isItemAdded = orderDao.createOrderItems(conn, order_id, item, quantity, note);
-
-                if (isItemAdded) {
-                    conn.commit();
-                    return true;
-                }
-            }
-            conn.rollback();
-            return false;
-
-        } catch (Exception e) {
-            try {
-                if (conn != null) conn.rollback();
-            } catch (SQLException ex) {
-                ex.printStackTrace();
-            }
-            e.printStackTrace();
-            return false;
-        } finally {
-            try {
-                if (conn != null) conn.close();
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
-        }
+        return orderDao.createOrderItems(order_id, item, quantity, note);
     }
 
 
@@ -178,21 +144,70 @@ public class IOrderServiceImpl implements IOrderService {
         return orderDao.getOrderItemStatus(order_item_id);
     }
 
-    public boolean updateOrderItemStatus(int order_item_id,OrderItemEnum orderItemEnum) {
-        if(order_item_id <= 0) {
+    public boolean updateOrderItemStatus(Order_Item item, OrderItemEnum currentStatus) {
+        if (item == null) {
             System.out.println(Constant.VARIABLE_ERR_MGS);
             return false;
         }
-        if(orderItemEnum.equals(OrderItemEnum.cancel)) {
-            System.out.println("Đơn này đã bị huỷ!");
+
+        Connection conn = null;
+        try {
+            conn = DatabaseConnection.openConnection();
+            conn.setAutoCommit(false);
+
+            boolean success = false;
+
+            switch (currentStatus) {
+                case waiting:
+                    success = orderDao.updateOrderItemStatus(conn, item.getId(), OrderItemEnum.pending);
+                    break;
+                case pending:
+                    boolean isStatusUpdated = orderDao.updateOrderItemStatus(conn, item.getId(), OrderItemEnum.cooking);
+
+                    double amountToAdd = item.getUnit_price() * item.getQuantity();
+
+                    boolean isAmountUpdated = orderDao.updateOrderAmount(conn, item.getOrder().getId(), amountToAdd);
+
+                    if (isStatusUpdated && isAmountUpdated) {
+                        success = true;
+                    }
+                    break;
+
+                case cooking:
+                    success = orderDao.updateOrderItemStatus(conn, item.getId(), OrderItemEnum.ready);
+                    break;
+
+                case ready:
+                    success = orderDao.updateOrderItemStatus(conn, item.getId(), OrderItemEnum.served);
+                    break;
+
+                default:
+                    System.out.println("Trạng thái không hợp lệ để cập nhật!");
+                    success = false;
+            }
+
+            if (success) {
+                conn.commit();
+                return true;
+            } else {
+                conn.rollback();
+                return false;
+            }
+
+        } catch (Exception e) {
+            try {
+                if (conn != null) conn.rollback();
+            } catch (SQLException ex) {
+                System.out.println("Lỗi SQL");
+            }
             return false;
+        } finally {
+            try {
+                if (conn != null) conn.close();
+            } catch (SQLException e) {
+                System.out.println("Lỗi SQL");
+            }
         }
-        return switch (orderItemEnum) {
-            case OrderItemEnum.pending -> orderDao.updateOrderItemStatus(order_item_id, OrderItemEnum.cooking);
-            case OrderItemEnum.cooking -> orderDao.updateOrderItemStatus(order_item_id, OrderItemEnum.ready);
-            case OrderItemEnum.ready -> orderDao.updateOrderItemStatus(order_item_id, OrderItemEnum.served);
-            default -> false;
-        };
     }
 
     public boolean payOrder(Order order, LocalDateTime checkoutAt) {

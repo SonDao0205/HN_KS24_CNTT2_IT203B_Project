@@ -63,3 +63,6 @@ create table Reviews(
                         foreign key(user_id) references Users(id),
                         star int not null check(star >= 0 AND star <= 5)
 );
+
+ALTER TABLE Orders
+    ADD COLUMN checkout_at DATETIME NULL;

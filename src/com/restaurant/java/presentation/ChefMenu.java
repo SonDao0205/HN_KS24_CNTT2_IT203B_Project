@@ -76,9 +76,11 @@ public class ChefMenu {
             return;
         }
         OrderItemEnum status = null;
+        Order_Item item = null;
         for (Order_Item orderItem : orderItemList) {
             if(orderItem.getId() == id){
                 status = orderItem.getStatus();
+                item = orderItem;
             }
         }
 
@@ -109,7 +111,7 @@ public class ChefMenu {
         int choice = InputMethod.getInt(sc, "Lựa chọn của bạn : ");
         switch (choice) {
             case 1:
-                if (IOrderServiceImpl.getInstance().updateOrderItemStatus(id, status)) {
+                if (IOrderServiceImpl.getInstance().updateOrderItemStatus(item, status)) {
                     System.out.println(Constant.GREEN_CODE + "Cập nhật thành công!" + Constant.RESET_CODE);
                 } else {
                     System.out.println(Constant.RED_CODE + "Cập nhật thất bại!" + Constant.RESET_CODE);
